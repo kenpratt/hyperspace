@@ -5,6 +5,8 @@
 var Hyperspace = function() {
   this.c = new Coquette(this, "canvas", 1000, 600, "#000");
 
+  this.connect();
+
   this.c.entities.create(Person, { center: { x:250, y:40 }, color:"#099" });
 
   this.c.entities.create(Person, { center: { x:256, y:110 }, color:"#f07",
@@ -18,6 +20,24 @@ var Hyperspace = function() {
     }
   });
 };
+
+Hyperspace.prototype.connect = function() {
+  this.socket = new WebSocket("ws://" + window.location.host + "/api");
+
+  var that = this;
+  this.socket.onopen = function() {
+    console.log("websocket connected");
+    that.socket.send("test");
+  };
+
+  this.socket.onclose = function() {
+    console.log("websocket disconnected");
+  };
+
+  this.socket.onmessage = function(msg) {
+    console.log("websocket received message", msg);
+  };
+}
 
 var Person = function(game, settings) {
   this.c = game.c;
