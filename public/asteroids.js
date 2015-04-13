@@ -22,7 +22,7 @@ var Hyperspace = function() {
 };
 
 Hyperspace.prototype.connect = function() {
-  this.socket = new WebSocket("ws://" + window.location.host + "/api");
+  this.socket = new WebSocket("ws://" + window.location.host + "/ws");
 
   var that = this;
   this.socket.onopen = function() {

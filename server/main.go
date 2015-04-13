@@ -15,7 +15,7 @@ func EchoServer(ws *websocket.Conn) {
 
 // This example demonstrates a trivial echo server.
 func main() {
-	http.Handle("/api", websocket.Handler(EchoServer))
+	http.Handle("/ws", websocket.Handler(EchoServer))
 
 	// TODO restrict static file serving to dev mode
 	fs := http.FileServer(http.Dir("public"))
