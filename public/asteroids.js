@@ -45,7 +45,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
   this.c.entities.create(Ship, {
-    center: { x: data.x, y: data.y }
+    center: { x: data.x, y: data.y },
     id: data.id,
     color:"#f07",
 
