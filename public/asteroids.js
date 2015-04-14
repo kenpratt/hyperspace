@@ -6,12 +6,23 @@
 
 // The main game initializer. This function sets up the game.
 var Hyperspace = function() {
-  this.c = new Coquette(this, "canvas", 1000, 600, "#000");
+  this.size = {x: 1000, y: 600};
+  this.c = new Coquette(this, "canvas", this.size.x, this.size.y, "#000");
 
   this.conn = new ServerConnection("ws://" + window.location.host + "/ws");
   this.conn.connect();
 
   this.playerId = null;
+
+  this.update = function() {
+    for (var i = this.c.entities.all(Star).length; i < 100; i++) {
+      var where = {
+        x: this.size.x * Math.random(),
+        y: this.size.y * Math.random(),
+      }
+      this.c.entities.create(Star, {center: where});
+    }
+  };
 
   this.conn.handle("init", function(data) {
     this.playerId = data.id;
@@ -40,6 +51,24 @@ var Hyperspace = function() {
       this.addEnemyShip(data);
     }
   }.bind(this));
+};
+
+var Star = function(game, settings) {
+  this.c = game.c;
+  for (var i in settings) {
+    this[i] = settings[i];
+  }
+  this.zindex = -1;
+  this.size = {x: 5, y: 5};
+  this.update = function() {
+    if (!this.c.renderer.onScreen(this)) {
+      this.c.entities.destroy(this);
+    }
+  };
+  this.draw = function(ctx) {
+    ctx.fillStyle = "rgb(200,0,0)";
+    ctx.fillRect(this.center.x, this.center.y, this.size.x, this.size.y);
+  };
 };
 
 Hyperspace.prototype.addOwnShip = function(data) {
