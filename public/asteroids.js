@@ -173,8 +173,8 @@ var Laser = function(game, settings) {
     var age = Date.now() - this.created;
     // Kill lazers older than three seconds.
     if (age < 3000) {
-      this.center.x += this.vector.x;
-      this.center.y += this.vector.y;
+      this.center.x += (this.vector.x * 2);
+      this.center.y += (this.vector.y * 2);
     } else {
       this.c.entities.destroy(this);
     }
