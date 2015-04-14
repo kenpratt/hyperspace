@@ -32,3 +32,9 @@ sudo EDITOR=emacs visudo
 ```
 hyperspace ALL=(ALL) NOPASSWD: /home/hyperspace/hyperspace/bin/restart
 ```
+
+### Add dependencies
+
+```sh
+go get github.com/gorilla/websocket
+```
