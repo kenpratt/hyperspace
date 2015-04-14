@@ -56,6 +56,16 @@ Hyperspace.prototype.connect = function() {
   };
 }
 
+// This defines the basic ship shape as a series of verices for a path to
+// follow.
+var ship_shape = [
+  [0, 0],
+  [-5, 10],
+  [0, 7],
+  [5, 10],
+  [0, 0]
+]
+
 // The actual ship entity. One of these will be created for every single player
 // in the game. Please set the color.
 var Ship = function(game, settings) {
@@ -64,14 +74,23 @@ var Ship = function(game, settings) {
     this[i] = settings[i];
   }
 
-  this.size = { x:9, y:9 };
+  // This is the size of the ship.
+  this.scale = 1.5;
+
+  // This is run every tick to draw the ship.
   this.draw = function(ctx) {
-    ctx.fillStyle = settings.color;
-    ctx.fillRect(
-        this.center.x - this.size.x / 2,
-        this.center.y - this.size.y / 2,
-        this.size.x,
-        this.size.y);
+    // The color of the outline of the ship.
+    ctx.strokeStyle = settings.color;
+
+    // Draw the actual ship body.
+    ctx.beginPath();
+    for (i in ship_shape) {
+      var vertex = ship_shape[i];
+      var x = (vertex[0] * this.scale) + this.center.x;
+      var y = (vertex[1] * this.scale) + this.center.y;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
   };
 };
 
