@@ -11,6 +11,11 @@ var Hyperspace = function() {
   this.conn = new ServerConnection("ws://" + window.location.host + "/ws");
   this.conn.connect();
 
+  this.conn.handle("position", function(pos) {
+    var ship = this.c.entities.all()[0]
+    ship.center = pos;
+  }.bind(this));
+
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
@@ -87,6 +92,7 @@ var Ship = function(game, settings) {
 var ServerConnection = function(url) {
   this.url = url;
   this.socket = null;
+  this.handlers = {};
 };
 
 ServerConnection.prototype.connect = function() {
@@ -109,6 +115,11 @@ ServerConnection.prototype.onMessage = function(ev) {
   var type = raw[0];
   var data = raw[1];
   console.log("websocket received message", type, data);
+
+  var fn = this.handlers[type];
+  if (fn) {
+    fn(data);
+  }
 };
 
 ServerConnection.prototype.send = function(type, data) {
@@ -119,6 +130,10 @@ ServerConnection.prototype.send = function(type, data) {
   } else {
     console.warn("websocket not connected, can't send message", type, data);
   }
+};
+
+ServerConnection.prototype.handle = function(type, fn) {
+  this.handlers[type] = fn;
 };
 
 window.addEventListener('load', function() {
