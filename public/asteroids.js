@@ -67,6 +67,13 @@ var Hyperspace = function() {
         this.lastY = this.center.y;
         this.conn.send("position", this.center);
       }
+
+      // Fire the lasers! Say Pew Pew Pew every time you press the space bar
+      // please.
+      if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
+        console.log("Pew Pew Pew!");
+        this.c.entities.create(Laser, { center: { x:this.center.x, y:this.center.y}, vector: angleToVector(this.angle)});
+      }
     },
   });
 };
@@ -109,6 +116,31 @@ var Ship = function(game, settings) {
       ctx.lineTo(x, y);
     }
     ctx.stroke();
+  };
+};
+
+var Laser = function(game, settings) {
+  this.c = game.c;
+  this.conn = game.conn;
+  for (var i in settings) {
+    this[i] = settings[i];
+  }
+
+  this.update = function() {
+    // TODO(icco): move the lazers
+  };
+
+  this.draw = function(ctx) {
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(
+        this.center.x, // x
+        this.center.y, // y
+        5, // Radius
+        0, // Start Angle
+        Math.PI*2, // End Angle
+        true); // Anticlockwise?
+    ctx.fill();
   };
 };
 
