@@ -24,3 +24,4 @@ _testmain.go
 *.prof
 
 server/server
+.DS_Store
