@@ -1,6 +1,10 @@
 # hyperspace
 
-A real-time multiplayer space shooter
+A real-time multiplayer space shooter.
+
+## Development
+
+ * Run `make` to run a local copy at http://localhost:9393.
 
 ## Installation
 
