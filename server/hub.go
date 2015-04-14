@@ -10,23 +10,25 @@ package main
 // connections.
 type hub struct {
 	// Registered connections.
-	connections map[*connection]bool
+	connections map[*Connection]bool
 
 	// Inbound messages from the connections.
-	broadcast chan []byte
+	broadcast chan *Message
 
 	// Register requests from the connections.
-	register chan *connection
+	register chan *Connection
 
 	// Unregister requests from connections.
-	unregister chan *connection
+	unregister chan *Connection
+
+	nextId uint16
 }
 
 var h = hub{
-	broadcast:   make(chan []byte),
-	register:    make(chan *connection),
-	unregister:  make(chan *connection),
-	connections: make(map[*connection]bool),
+	broadcast:   make(chan *Message),
+	register:    make(chan *Connection),
+	unregister:  make(chan *Connection),
+	connections: make(map[*Connection]bool),
 }
 
 func (h *hub) run() {
@@ -34,6 +36,8 @@ func (h *hub) run() {
 		select {
 		case c := <-h.register:
 			h.connections[c] = true
+			h.nextId++
+			c.Init(h.nextId)
 		case c := <-h.unregister:
 			if _, ok := h.connections[c]; ok {
 				delete(h.connections, c)
