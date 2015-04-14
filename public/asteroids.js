@@ -19,11 +19,10 @@ var Hyperspace = function() {
   }.bind(this));
 
   this.conn.handle("position", function(data) {
-    // TODO use map to lookup by id instead of iterating
-    var entities = this.c.entities.all();
+    // TODO: use map to lookup by id instead of iterating
+    var entities = this.c.entities.all(Ship);
     var ship = null;
-    for (var i=0; i<entities.length; i++) {
-      console.log("check", i, entities[i].id, data.id);
+    for (i in entities) {
       if (entities[i].id === data.id) {
         ship = entities[i];
         break;
@@ -34,7 +33,7 @@ var Hyperspace = function() {
       ship.center.x = data.x;
       ship.center.y = data.y;
     } else {
-      console.log("adding enemy ship");
+      console.log("Adding enemy ship");
       this.addEnemyShip(data);
     }
   }.bind(this));
@@ -99,12 +98,15 @@ Hyperspace.prototype.addOwnShip = function(data) {
 
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
-      if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
-        this.c.entities.create(Laser, {
-          center: { x:this.center.x, y:this.center.y},
-          vector: angleToVector(this.angle),
-          owner: this.id,
-        });
+      if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
+        if (this.c.entities.all(Laser).length < 30) {
+          this.c.entities.create(Laser, {
+            center: { x:this.center.x, y:this.center.y },
+            vector: angleToVector(this.angle),
+            owner: this.id,
+            created: Date.now(),
+          });
+        }
       }
     },
   });
@@ -168,8 +170,14 @@ var Laser = function(game, settings) {
   }
 
   this.update = function() {
-    this.center.x += this.vector.x;
-    this.center.y += this.vector.y;
+    var age = Date.now() - this.created;
+    // Kill lazers older than three seconds.
+    if (age < 3000) {
+      this.center.x += this.vector.x;
+      this.center.y += this.vector.y;
+    } else {
+      this.c.entities.destroy(this);
+    }
   };
 
   this.draw = function(ctx) {
@@ -211,7 +219,7 @@ ServerConnection.prototype.onMessage = function(ev) {
   var raw = JSON.parse(ev.data);
   var type = raw.type;
   var data = raw.data;
-  console.log("websocket received message", type, data);
+  // console.log("websocket received message", type, data);
 
   var fn = this.handlers[type];
   if (fn) {
@@ -222,7 +230,7 @@ ServerConnection.prototype.onMessage = function(ev) {
 ServerConnection.prototype.send = function(type, data) {
   var msg = JSON.stringify({ type: type, data: data });
   if (this.socket.readyState === this.socket.OPEN) {
-    console.log("websocket sending message", type, data);
+    // console.log("websocket sending message", type, data);
     this.socket.send(msg);
   } else {
     console.warn("websocket not connected, can't send message", type, data);
