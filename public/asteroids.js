@@ -32,6 +32,9 @@ var Hyperspace = function() {
     if (ship) {
       ship.center.x = data.x;
       ship.center.y = data.y;
+
+      // This keeps the players ship always in the center.
+      this.c.renderer.setViewCenter(ship.center);
     } else {
       console.log("Adding enemy ship");
       this.addEnemyShip(data);
