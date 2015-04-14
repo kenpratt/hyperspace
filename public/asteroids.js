@@ -19,7 +19,11 @@ var Hyperspace = function() {
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
-  this.c.entities.create(Ship, { center: { x:256, y:110 }, color:"#f07",
+  this.c.entities.create(Ship, {
+    center: { x:256, y:110 },
+    id: "player",
+    color:"#f07",
+
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function() {
@@ -71,8 +75,11 @@ var Hyperspace = function() {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isDown(this.c.inputter.SPACE)) {
-        console.log("Pew Pew Pew!");
-        this.c.entities.create(Laser, { center: { x:this.center.x, y:this.center.y}, vector: angleToVector(this.angle)});
+        this.c.entities.create(Laser, {
+          center: { x:this.center.x, y:this.center.y},
+          vector: angleToVector(this.angle),
+          owner: this.id, // TODO(kenpratt): Have ID be dynamic.
+        });
       }
     },
   });
@@ -127,7 +134,8 @@ var Laser = function(game, settings) {
   }
 
   this.update = function() {
-    // TODO(icco): move the lazers
+    this.center.x += this.vector.x;
+    this.center.y += this.vector.y;
   };
 
   this.draw = function(ctx) {
