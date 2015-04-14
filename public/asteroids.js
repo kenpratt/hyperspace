@@ -83,11 +83,11 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Turning.
       // TODO(icco): Support D and E
       if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
-        this.angle += 0.6;
+        this.angle += 2;
 
       // TODO(icco): Support A
       } else if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
-        this.angle -= 0.6;
+        this.angle -= 2;
       }
 
       if (this.lastX !== this.center.x || this.lastY !== this.center.y) {
