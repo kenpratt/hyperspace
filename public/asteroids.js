@@ -68,25 +68,36 @@ Hyperspace.prototype.addOwnShip = function(data) {
 
       this.angle %= 360;
 
+      // Key pressed booleans
+      var forward_pressed =
+        this.c.inputter.isDown(this.c.inputter.UP_ARROW) ||
+        this.c.inputter.isDown(this.c.inputter.W) ||
+        this.c.inputter.isDown(this.c.inputter.COMMA);
+      var down_pressed =
+        this.c.inputter.isDown(this.c.inputter.DOWN_ARROW) ||
+        this.c.inputter.isDown(this.c.inputter.S) ||
+        this.c.inputter.isDown(this.c.inputter.O);
+      var left_pressed =
+        this.c.inputter.isDown(this.c.inputter.LEFT_ARROW) ||
+        this.c.inputter.isDown(this.c.inputter.A);
+      var right_pressed =
+        this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW) ||
+        this.c.inputter.isDown(this.c.inputter.D) ||
+        this.c.inputter.isDown(this.c.inputter.E);
+
       // Back and forth movement
-      // TODO(icco): Support W and ,
-      if (this.c.inputter.isDown(this.c.inputter.UP_ARROW)) {
+      if (forward_pressed) {
         var vector = angleToVector(this.angle);
         this.center.x += vector.x;
         this.center.y += vector.y;
-
-      // TODO(icco): Support S and O
-      } else if (this.c.inputter.isDown(this.c.inputter.DOWN_ARROW)) {
+      } else if (down_pressed) {
         // TODO(icco): Support breaking.
       }
 
       // Turning.
-      // TODO(icco): Support D and E
-      if (this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW)) {
+      if (right_pressed) {
         this.angle += 2;
-
-      // TODO(icco): Support A
-      } else if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
+      } else if (left_pressed) {
         this.angle -= 2;
       }
 
