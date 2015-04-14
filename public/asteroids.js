@@ -8,7 +8,13 @@
 var Hyperspace = function() {
   this.c = new Coquette(this, "canvas", 1000, 600, "#000");
 
-  this.connect();
+  this.conn = new ServerConnection("ws://" + window.location.host + "/ws");
+  this.conn.connect();
+
+  this.conn.handle("position", function(pos) {
+    var ship = this.c.entities.all()[0]
+    ship.center = pos;
+  }.bind(this));
 
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
@@ -55,27 +61,15 @@ var Hyperspace = function() {
       } else if (this.c.inputter.isDown(this.c.inputter.LEFT_ARROW)) {
         this.angle -= 0.6;
       }
+
+      if (this.lastX !== this.center.x || this.lastY !== this.center.y) {
+        this.lastX = this.center.x;
+        this.lastY = this.center.y;
+        this.conn.send("position", this.center);
+      }
     },
   });
 };
-
-Hyperspace.prototype.connect = function() {
-  this.socket = new WebSocket("ws://" + window.location.host + "/ws");
-
-  var that = this;
-  this.socket.onopen = function() {
-    console.log("websocket connected");
-    that.socket.send("test");
-  };
-
-  this.socket.onclose = function() {
-    console.log("websocket disconnected");
-  };
-
-  this.socket.onmessage = function(msg) {
-    console.log("websocket received message", msg);
-  };
-}
 
 // This defines the basic ship shape as a series of verices for a path to
 // follow.
@@ -91,6 +85,7 @@ var ship_shape = [
 // in the game. Please set the color.
 var Ship = function(game, settings) {
   this.c = game.c;
+  this.conn = game.conn;
   for (var i in settings) {
     this[i] = settings[i];
   }
@@ -115,6 +110,53 @@ var Ship = function(game, settings) {
     }
     ctx.stroke();
   };
+};
+
+var ServerConnection = function(url) {
+  this.url = url;
+  this.socket = null;
+  this.handlers = {};
+};
+
+ServerConnection.prototype.connect = function() {
+  this.socket = new WebSocket(this.url);
+  this.socket.onopen = this.onConnect.bind(this);
+  this.socket.onclose = this.onDisconnect.bind(this);
+  this.socket.onmessage = this.onMessage.bind(this);
+}
+
+ServerConnection.prototype.onConnect = function() {
+  console.log("websocket connected");
+};
+
+ServerConnection.prototype.onDisconnect = function() {
+  console.log("websocket disconnected");
+};
+
+ServerConnection.prototype.onMessage = function(ev) {
+  var raw = JSON.parse(ev.data);
+  var type = raw[0];
+  var data = raw[1];
+  console.log("websocket received message", type, data);
+
+  var fn = this.handlers[type];
+  if (fn) {
+    fn(data);
+  }
+};
+
+ServerConnection.prototype.send = function(type, data) {
+  var msg = JSON.stringify([type, data]);
+  if (this.socket.readyState === this.socket.OPEN) {
+    console.log("websocket sending message", type, data);
+    this.socket.send(msg);
+  } else {
+    console.warn("websocket not connected, can't send message", type, data);
+  }
+};
+
+ServerConnection.prototype.handle = function(type, fn) {
+  this.handlers[type] = fn;
 };
 
 window.addEventListener('load', function() {
