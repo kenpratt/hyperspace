@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -34,16 +35,25 @@ var upgrader = websocket.Upgrader{
 }
 
 // connection is an middleman between the websocket connection and the hub.
-type connection struct {
+type Connection struct {
 	// The websocket connection.
 	ws *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	send chan *Message
+
+	id uint16
+}
+
+func (c *Connection) Init(id uint16) {
+	c.id = id
+	b, _ := json.Marshal(PlayerData{c.id, 256, 110})
+	raw := json.RawMessage(b)
+	c.send <- &Message{"init", &raw}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
-func (c *connection) readPump() {
+func (c *Connection) readPump() {
 	defer func() {
 		h.unregister <- c
 		c.ws.Close()
@@ -52,22 +62,40 @@ func (c *connection) readPump() {
 	c.ws.SetReadDeadline(time.Now().Add(pongWait))
 	c.ws.SetPongHandler(func(string) error { c.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.ws.ReadMessage()
+		var message Message
+		err := c.ws.ReadJSON(&message)
 		if err != nil {
 			break
 		}
-		h.broadcast <- message
+
+		switch message.Type {
+		case "position":
+			var pos PositionData
+			err = json.Unmarshal([]byte(*message.Data), &pos)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			b, _ := json.Marshal(PlayerData{c.id, pos.X, pos.Y})
+			raw := json.RawMessage(b)
+			h.broadcast <- &Message{"position", &raw}
+		}
 	}
 }
 
 // write writes a message with the given message type and payload.
-func (c *connection) write(mt int, payload []byte) error {
+func (c *Connection) write(mt int, payload []byte) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteMessage(mt, payload)
 }
 
+func (c *Connection) writeJSON(message *Message) error {
+	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
+	return c.ws.WriteJSON(message)
+}
+
 // writePump pumps messages from the hub to the websocket connection.
-func (c *connection) writePump() {
+func (c *Connection) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -80,7 +108,8 @@ func (c *connection) writePump() {
 				c.write(websocket.CloseMessage, []byte{})
 				return
 			}
-			if err := c.write(websocket.TextMessage, message); err != nil {
+
+			if err := c.writeJSON(message); err != nil {
 				return
 			}
 		case <-ticker.C:
@@ -102,7 +131,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	c := &connection{send: make(chan []byte, 256), ws: ws}
+	c := &Connection{send: make(chan *Message, 256), ws: ws}
 	h.register <- c
 	go c.writePump()
 	c.readPump()

@@ -11,15 +11,40 @@ var Hyperspace = function() {
   this.conn = new ServerConnection("ws://" + window.location.host + "/ws");
   this.conn.connect();
 
-  this.conn.handle("position", function(pos) {
-    var ship = this.c.entities.all()[0]
-    ship.center = pos;
+  this.playerId = null;
+
+  this.conn.handle("init", function(data) {
+    this.playerId = data.id;
+    this.addOwnShip(data);
   }.bind(this));
 
+  this.conn.handle("position", function(data) {
+    // TODO use map to lookup by id instead of iterating
+    var entities = this.c.entities.all();
+    var ship = null;
+    for (var i=0; i<entities.length; i++) {
+      console.log("check", i, entities[i].id, data.id);
+      if (entities[i].id === data.id) {
+        ship = entities[i];
+        break;
+      }
+    }
+
+    if (ship) {
+      ship.center.x = data.x;
+      ship.center.y = data.y;
+    } else {
+      console.log("adding enemy ship");
+      this.addEnemyShip(data);
+    }
+  }.bind(this));
+};
+
+Hyperspace.prototype.addOwnShip = function(data) {
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
-  this.c.entities.create(Ship, { center: { x:256, y:110 }, color:"#f07",
+  this.c.entities.create(Ship, { id: data.id, center: { x: data.x, y: data.y }, color:"#f07",
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function() {
@@ -77,6 +102,11 @@ var Hyperspace = function() {
     },
   });
 };
+
+Hyperspace.prototype.addEnemyShip = function(data) {
+  this.c.entities.create(Ship, { id: data.id, center: { x: data.x, y: data.y }, color:"#0f7" });
+};
+
 
 // This defines the basic ship shape as a series of verices for a path to
 // follow.
@@ -167,8 +197,8 @@ ServerConnection.prototype.onDisconnect = function() {
 
 ServerConnection.prototype.onMessage = function(ev) {
   var raw = JSON.parse(ev.data);
-  var type = raw[0];
-  var data = raw[1];
+  var type = raw.type;
+  var data = raw.data;
   console.log("websocket received message", type, data);
 
   var fn = this.handlers[type];
@@ -178,7 +208,7 @@ ServerConnection.prototype.onMessage = function(ev) {
 };
 
 ServerConnection.prototype.send = function(type, data) {
-  var msg = JSON.stringify([type, data]);
+  var msg = JSON.stringify({ type: type, data: data });
   if (this.socket.readyState === this.socket.OPEN) {
     console.log("websocket sending message", type, data);
     this.socket.send(msg);
