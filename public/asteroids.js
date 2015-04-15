@@ -85,7 +85,7 @@ var Star = function(game, settings) {
   for (var i in settings) {
     this[i] = settings[i];
   }
-  this.zindex = -1;
+  this.zindex = -3;
   this.size = {x: 5, y: 5};
   this.update = function() {
     if (!this.c.renderer.onScreen(this)) {
@@ -237,6 +237,10 @@ var Ship = function(game, settings) {
 var Laser = function(game, settings) {
   this.c = game.c;
   this.conn = game.conn;
+  this.boundingBox = this.c.collider.CIRCLE;
+  this.size = { x: 3, y: 3 };
+  this.zindex = -1;
+
   for (var i in settings) {
     this[i] = settings[i];
   }
@@ -258,7 +262,7 @@ var Laser = function(game, settings) {
     ctx.arc(
         this.center.x, // x
         this.center.y, // y
-        5, // Radius
+        this.size.x, // Radius
         0, // Start Angle
         Math.PI*2, // End Angle
         true); // Anticlockwise?
