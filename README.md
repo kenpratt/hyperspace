@@ -6,6 +6,8 @@ A real-time multiplayer space shooter.
 
  * Run `make` to run a local copy at http://localhost:9393.
 
+ * Run `./watch` to run a local copy that auto-restarts when server files are changed (requires fswatch - `brew install fswatch`)
+
 ## Installation
 
 ### Add to Nginx configuration
