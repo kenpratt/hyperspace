@@ -9,7 +9,7 @@ function getRandom(min, max) {
 }
 
 // http://stackoverflow.com/a/6444043/1063
-function increase_brightness(hex, percent) {
+function increaseBrightness(hex, percent) {
   // strip the leading # if it's there
   hex = hex.replace(/^\s*#|\s*$/g, '');
 
@@ -88,14 +88,16 @@ var Star = function(game, settings) {
     this[i] = settings[i];
   }
   this.zindex = -3;
-  this.size = {x: 5, y: 5};
+  this.width = 3 + (Math.random() * 4);
+  this.size = {x: this.width, y: this.width};
+  this.brightness = Math.random() * 100 - 50;
   this.update = function() {
     if (!this.c.renderer.onScreen(this)) {
       this.c.entities.destroy(this);
     }
   };
   this.draw = function(ctx) {
-    ctx.fillStyle = "#cc9933";
+    ctx.fillStyle = increaseBrightness("#cc9933", this.brightness);
     ctx.fillRect(this.center.x, this.center.y, this.size.x, this.size.y);
   };
 };
@@ -233,7 +235,7 @@ var Ship = function(game, settings) {
   this.draw = function(ctx) {
     // The color of the outline of the ship.
     ctx.strokeStyle = settings.color;
-    ctx.fillStyle = increase_brightness(settings.color, 10);
+    ctx.fillStyle = increaseBrightness(settings.color, 10);
 
     // Draw the actual ship body.
     ctx.beginPath();
