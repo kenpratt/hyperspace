@@ -4,6 +4,11 @@
 // This code is dependent on the coquette library:
 // http://coquette.maryrosecook.com/
 
+
+function getRandom(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 // The main game initializer. This function sets up the game.
 var Hyperspace = function() {
   this.size = {x: 1000, y: 600};
@@ -15,10 +20,11 @@ var Hyperspace = function() {
   this.playerId = null;
 
   this.update = function() {
+    center = this.c.renderer.getViewCenter()
     for (var i = this.c.entities.all(Star).length; i < 100; i++) {
       var where = {
-        x: this.size.x * Math.random(),
-        y: this.size.y * Math.random(),
+        x: getRandom((center.x - this.size.x/2), (center.x + this.size.x/2)),
+        y: getRandom((center.y - this.size.y/2), (center.y + this.size.y/2)),
       }
       this.c.entities.create(Star, {center: where});
     }
