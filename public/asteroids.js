@@ -47,6 +47,13 @@ var Hyperspace = function() {
       }
       this.c.entities.create(Star, {center: where});
     }
+
+    /* For Debugging
+    for (var i in this.c.entities.all(Ship)) {
+      var ship = this.c.entities.all(Ship)[i];
+      console.log(ship.id, ship.center);
+    }
+    */
   };
 
   this.conn.handle("init", function(data) {
@@ -68,9 +75,6 @@ var Hyperspace = function() {
     if (ship) {
       ship.center.x = data.x;
       ship.center.y = data.y;
-
-      // This keeps the players ship always in the center.
-      this.c.renderer.setViewCenter(ship.center);
     } else {
       console.log("Adding enemy ship");
       this.addEnemyShip(data);
@@ -108,6 +112,10 @@ Hyperspace.prototype.addOwnShip = function(data) {
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function() {
+
+      // This keeps the players ship always in the center.
+      this.c.renderer.setViewCenter(this.center);
+
       var angleToVector = function(angle) {
         // Convert to radians.
         var r = angle * 0.01745;
