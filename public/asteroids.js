@@ -9,6 +9,27 @@ function getRandom(min, max) {
   return Math.random() * (max - min) + min;
 }
 
+// http://stackoverflow.com/a/6444043/1063
+function increase_brightness(hex, percent) {
+  // strip the leading # if it's there
+  hex = hex.replace(/^\s*#|\s*$/g, '');
+
+  // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+  if (hex.length == 3) {
+    hex = hex.replace(/(.)/g, '$1$1');
+  }
+
+  var r = parseInt(hex.substr(0, 2), 16),
+      g = parseInt(hex.substr(2, 2), 16),
+      b = parseInt(hex.substr(4, 2), 16);
+
+  return '#' +
+    ((0|(1<<8) + r + (256 - r) * percent / 100).toString(16)).substr(1) +
+    ((0|(1<<8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
+    ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
+}
+
+
 // The main game initializer. This function sets up the game.
 var Hyperspace = function() {
   this.size = {x: 1000, y: 600};
@@ -198,6 +219,7 @@ var Ship = function(game, settings) {
   this.draw = function(ctx) {
     // The color of the outline of the ship.
     ctx.strokeStyle = settings.color;
+    ctx.fillStyle = increase_brightness(settings.color, 10);
 
     // Draw the actual ship body.
     ctx.beginPath();
@@ -208,6 +230,7 @@ var Ship = function(game, settings) {
       ctx.lineTo(x, y);
     }
     ctx.stroke();
+    ctx.fill();
   };
 };
 
