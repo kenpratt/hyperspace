@@ -18,6 +18,11 @@ type PositionData struct {
 	Y float64 `json:"y"`
 }
 
+type Vector struct {
+	X float64
+	Y float64
+}
+
 type PlayerData struct {
 	Id uint16  `json:"id"`
 	X  float64 `json:"x"`
@@ -30,7 +35,18 @@ type FireData struct {
 }
 
 type ProjectileData struct {
-	Id       string       `json:"id"`
-	Position PositionData `json:"position"`
-	Angle    float64      `json:"angle"`
+	Id       string        `json:"id"`
+	Position *PositionData `json:"position"`
+	Angle    float64       `json:"angle"`
+}
+
+func (p *ProjectileData) Vector() *Vector {
+	return AngleToVector(p.Angle)
+}
+
+func (p *ProjectileData) UpdateOneTick() {
+	p.Position = &PositionData{
+		X: p.Position.X + p.Vector().X,
+		Y: p.Position.Y + p.Vector().Y,
+	}
 }

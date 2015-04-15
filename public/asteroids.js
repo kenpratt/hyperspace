@@ -176,7 +176,6 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
 
-
         // Send an event (a cause of a thing) that describes what just
         // happened.
         this.conn.send("fire", {

@@ -86,10 +86,17 @@ func (c *Connection) readPump() {
 				log.Fatal(err)
 			}
 
-			pos := PositionData{X: 0, Y: 0}
-			b, _ := json.Marshal(ProjectileData{Id: data.Id, Angle: 0, Position: pos})
-			raw := json.RawMessage(b)
-			h.broadcast <- &Message{"fire", &raw}
+			// TODO: Why does this close the connection?
+			pos := &PositionData{X: 0, Y: 0}
+			projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
+			go func() {
+				for {
+					projectile.UpdateOneTick()
+					b, _ := json.Marshal(projectile)
+					raw := json.RawMessage(b)
+					h.broadcast <- &Message{"fire", &raw}
+				}
+			}()
 		}
 	}
 }
