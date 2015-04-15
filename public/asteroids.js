@@ -169,17 +169,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
       if (this.lastX !== this.center.x || this.lastY !== this.center.y) {
         this.lastX = this.center.x;
         this.lastY = this.center.y;
-        this.conn.send("position", {
-          center: this.center,
-          id: this.id,
-          angle: this.angle,
-          pressed: {
-            right: right_pressed,
-            down: down_pressed,
-            left: left_pressed,
-            forward: forward_pressed,
-          },
-        });
+        this.conn.send("position", this.center);
       }
 
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
