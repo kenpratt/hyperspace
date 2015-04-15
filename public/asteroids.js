@@ -88,7 +88,8 @@ var Star = function(game, settings) {
     this[i] = settings[i];
   }
   this.zindex = -3;
-  this.size = {x: 5, y: 5};
+  this.width = 3 + (Math.random() * 4);
+  this.size = {x: this.width, y: this.width};
   this.update = function() {
     if (!this.c.renderer.onScreen(this)) {
       this.c.entities.destroy(this);
