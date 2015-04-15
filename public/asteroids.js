@@ -4,7 +4,6 @@
 // This code is dependent on the coquette library:
 // http://coquette.maryrosecook.com/
 
-
 function getRandom(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -28,7 +27,6 @@ function increase_brightness(hex, percent) {
     ((0|(1<<8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
     ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
 }
-
 
 // The main game initializer. This function sets up the game.
 var Hyperspace = function() {
@@ -93,7 +91,7 @@ var Star = function(game, settings) {
     }
   };
   this.draw = function(ctx) {
-    ctx.fillStyle = "rgb(200,0,0)";
+    ctx.fillStyle = "#cc9933";
     ctx.fillRect(this.center.x, this.center.y, this.size.x, this.size.y);
   };
 };
