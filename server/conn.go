@@ -79,6 +79,17 @@ func (c *Connection) readPump() {
 			b, _ := json.Marshal(PlayerData{c.id, pos.X, pos.Y})
 			raw := json.RawMessage(b)
 			h.broadcast <- &Message{"position", &raw}
+		case "fire":
+			var data FireData
+			err = json.Unmarshal([]byte(*message.Data), &data)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			pos := PositionData{X: 0, Y: 0}
+			b, _ := json.Marshal(ProjectileData{Id: data.Id, Angle: 0, Position: pos})
+			raw := json.RawMessage(b)
+			h.broadcast <- &Message{"fire", &raw}
 		}
 	}
 }

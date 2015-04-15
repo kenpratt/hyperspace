@@ -175,6 +175,15 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
+
+
+        // Send an event (a cause of a thing) that describes what just
+        // happened.
+        this.conn.send("fire", {
+          id: this.id + "." + Date.now(),
+          time: Date.now(),
+        });
+
         if (this.c.entities.all(Laser).length < 30) {
           this.c.entities.create(Laser, {
             center: { x:this.center.x, y:this.center.y },

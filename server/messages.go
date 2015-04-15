@@ -23,3 +23,14 @@ type PlayerData struct {
 	X  float64 `json:"x"`
 	Y  float64 `json:"y"`
 }
+
+type FireData struct {
+	Id   string  `json:"id"`
+	Time float64 `json:"time"`
+}
+
+type ProjectileData struct {
+	Id       string       `json:"id"`
+	Position PositionData `json:"position"`
+	Angle    float64      `json:"angle"`
+}
