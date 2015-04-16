@@ -12,7 +12,7 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 
-	go h.run()
+	go game.run()
 
 	fmt.Println("Starting web server on http://localhost:9393/")
 	err := http.ListenAndServe(":9393", nil)

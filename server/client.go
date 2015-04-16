@@ -16,7 +16,7 @@ type Client struct {
 
 func makeClient(conn *Connection) *Client {
 	c := &Client{conn, 0}
-	h.register <- c
+	game.register <- c
 	return c
 }
 
@@ -34,7 +34,7 @@ func (c *Client) Initialize(playerId uint16) {
 
 func (c *Client) run() {
 	defer func() {
-		h.unregister <- c
+		game.unregister <- c
 		close(c.conn.send)
 	}()
 
@@ -61,7 +61,7 @@ func (c *Client) handleMessage(message *Message) {
 
 		b, _ := json.Marshal(PlayerData{c.playerId, pos.X, pos.Y})
 		raw := json.RawMessage(b)
-		h.broadcast <- &Message{"position", &raw}
+		game.broadcast <- &Message{"position", &raw}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -77,7 +77,7 @@ func (c *Client) handleMessage(message *Message) {
 				projectile.UpdateOneTick()
 				b, _ := json.Marshal(projectile)
 				raw := json.RawMessage(b)
-				h.broadcast <- &Message{"fire", &raw}
+				game.broadcast <- &Message{"fire", &raw}
 				time.Sleep(time.Duration(25) * time.Millisecond)
 			}
 		}()
