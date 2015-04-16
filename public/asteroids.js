@@ -28,6 +28,23 @@ function increaseBrightness(hex, percent) {
     ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
 }
 
+var utils = {
+  angleToVector: function(angle) {
+    // Convert to radians.
+    var r = angle * 0.01745;
+    return utils.unitVector({ x: Math.sin(r), y: -Math.cos(r) });
+  },
+  magnitude: function(vector) {
+    return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+  },
+  unitVector: function(vector) {
+    return {
+      x: vector.x / utils.magnitude(vector),
+      y: vector.y / utils.magnitude(vector)
+    };
+  },
+}
+
 // The main game initializer. This function sets up the game.
 var Hyperspace = function() {
   this.size = {x: 1000, y: 600};
@@ -118,21 +135,6 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // This keeps the players ship always in the center.
       this.c.renderer.setViewCenter(this.center);
 
-      var angleToVector = function(angle) {
-        // Convert to radians.
-        var r = angle * 0.01745;
-        return unitVector({ x: Math.sin(r), y: -Math.cos(r) });
-      };
-      var magnitude = function(vector) {
-        return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-      };
-      var unitVector = function(vector) {
-        return {
-          x: vector.x / magnitude(vector),
-          y: vector.y / magnitude(vector)
-        };
-      };
-
       this.angle %= 360;
 
       // Key pressed booleans
@@ -154,7 +156,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
 
       // Back and forth movement
       if (forward_pressed) {
-        var vector = angleToVector(this.angle);
+        var vector = utils.angleToVector(this.angle);
         this.center.x += vector.x;
         this.center.y += vector.y;
       } else if (down_pressed) {
@@ -188,7 +190,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
         if (this.c.entities.all(Laser).length < 30) {
           this.c.entities.create(Laser, {
             center: { x:this.center.x, y:this.center.y },
-            vector: angleToVector(this.angle),
+            vector: utils.angleToVector(this.angle),
             owner: this.id,
             created: Date.now(),
           });
