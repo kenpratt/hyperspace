@@ -29,7 +29,7 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 		panic(err)
 	}
 	raw := json.RawMessage(b)
-	c.Send(&Message{"init", makeTimestamp(), &raw})
+	c.Send(&Message{"init", MakeTimestamp(), &raw})
 
 	// boot client message handler
 	go c.run()

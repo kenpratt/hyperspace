@@ -161,7 +161,7 @@ func (g *Game) broadcastUpdate() {
 	}
 
 	raw := json.RawMessage(b)
-	m := &Message{"update", makeTimestamp(), &raw}
+	m := &Message{"update", MakeTimestamp(), &raw}
 
 	for c := range g.clients {
 		c.Send(m)
