@@ -7,7 +7,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -39,24 +38,16 @@ type Connection struct {
 	// The websocket connection.
 	ws *websocket.Conn
 
-	// Buffered channel of outbound messages.
-	send chan *Message
-
-	id uint16
-}
-
-func (c *Connection) Init(id uint16) {
-	c.id = id
-	b, _ := json.Marshal(PlayerData{c.id, 256, 110})
-	raw := json.RawMessage(b)
-	c.send <- &Message{"init", &raw}
+	// Buffered channels of inbound and outbound messages.
+	receive chan *Message
+	send    chan *Message
 }
 
 // readPump pumps messages from the websocket connection to the hub.
 func (c *Connection) readPump() {
 	defer func() {
-		h.unregister <- c
 		c.ws.Close()
+		close(c.receive)
 	}()
 	c.ws.SetReadLimit(maxMessageSize)
 	c.ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -67,38 +58,7 @@ func (c *Connection) readPump() {
 		if err != nil {
 			break
 		}
-
-		switch message.Type {
-		case "position":
-			var pos PositionData
-			err = json.Unmarshal([]byte(*message.Data), &pos)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			b, _ := json.Marshal(PlayerData{c.id, pos.X, pos.Y})
-			raw := json.RawMessage(b)
-			h.broadcast <- &Message{"position", &raw}
-		case "fire":
-			var data FireData
-			err = json.Unmarshal([]byte(*message.Data), &data)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// TODO: Why does this close the connection?
-			pos := &PositionData{X: 0, Y: 0}
-			projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
-			go func() {
-				for i := 0; i < 1000; i++ {
-					projectile.UpdateOneTick()
-					b, _ := json.Marshal(projectile)
-					raw := json.RawMessage(b)
-					h.broadcast <- &Message{"fire", &raw}
-					time.Sleep(time.Duration(25) * time.Millisecond)
-				}
-			}()
-		}
+		c.receive <- &message
 	}
 }
 
@@ -150,8 +110,8 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	c := &Connection{send: make(chan *Message, 256), ws: ws}
-	h.register <- c
+	c := &Connection{ws, make(chan *Message, 256), make(chan *Message, 256)}
+	makeClient(c)
 	go c.writePump()
 	c.readPump()
 }

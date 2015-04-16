@@ -6,51 +6,45 @@
 
 package main
 
-// hub maintains the set of active connections and broadcasts messages to the
-// connections.
+// hub maintains the set of active clients and broadcasts messages to the
+// clients.
 type hub struct {
-	// Registered connections.
-	connections map[*Connection]bool
+	// Registered clients.
+	clients map[*Client]bool
 
-	// Inbound messages from the connections.
+	// Inbound messages from the clients.
 	broadcast chan *Message
 
-	// Register requests from the connections.
-	register chan *Connection
+	// Register requests from the clients.
+	register chan *Client
 
-	// Unregister requests from connections.
-	unregister chan *Connection
+	// Unregister requests from clients.
+	unregister chan *Client
 
 	nextId uint16
 }
 
 var h = hub{
-	broadcast:   make(chan *Message),
-	register:    make(chan *Connection),
-	unregister:  make(chan *Connection),
-	connections: make(map[*Connection]bool),
+	broadcast:  make(chan *Message),
+	register:   make(chan *Client),
+	unregister: make(chan *Client),
+	clients:    make(map[*Client]bool),
 }
 
 func (h *hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			h.connections[c] = true
+			h.clients[c] = true
 			h.nextId++
-			c.Init(h.nextId)
+			c.Initialize(h.nextId)
 		case c := <-h.unregister:
-			if _, ok := h.connections[c]; ok {
-				delete(h.connections, c)
-				close(c.send)
+			if _, ok := h.clients[c]; ok {
+				delete(h.clients, c)
 			}
 		case m := <-h.broadcast:
-			for c := range h.connections {
-				select {
-				case c.send <- m:
-				default:
-					close(c.send)
-					delete(h.connections, c)
-				}
+			for c := range h.clients {
+				c.Send(m)
 			}
 		}
 	}
