@@ -120,8 +120,9 @@ Hyperspace.prototype.handleUpdate = function(state) {
   }
 
   // TODO: This doesn't quite work yet. 
-  for (var i in this.c.entities.all(Laser)) {
-    ent = this.c.entities.all(Laser)[i];
+  var ents = this.c.entities.all(Laser);
+  for (var i in ents) {
+    ent = ents[i];
     if (ent != undefined && state.projectiles[ent.id] == undefined) {
       this.c.entities.destroy(ent);
     }
