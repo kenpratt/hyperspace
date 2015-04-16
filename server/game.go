@@ -65,7 +65,8 @@ func (g *Game) run() {
 			// create player
 			g.nextId++
 			id := strconv.Itoa(g.nextId)
-			p := &PlayerData{id, 256, 110}
+			pos := &PositionData{X: 256, Y: 110}
+			p := &PlayerData{Id: id, Angle: 0, Position: pos}
 			g.players[p.Id] = p
 
 			// send initial player data
@@ -90,17 +91,18 @@ func (g *Game) run() {
 }
 
 func (g *Game) applyEvent(e *Event) error {
+	p := g.players[e.PlayerId]
+	if p == nil {
+		return GameError{"Player doesn't exist"}
+	}
+
 	switch e.Type {
 	case "position":
-		data := e.Data.(*PlayerData)
-		p := g.players[data.Id]
-		if p == nil {
-			return GameError{"Player doesn't exist"}
-		}
+		data := e.Data.(*PositionData)
 
 		// move the player
-		p.X = data.X
-		p.Y = data.Y
+		p.Position.X = data.X
+		p.Position.Y = data.X
 		return nil
 	case "fire":
 		data := e.Data.(*FireData)

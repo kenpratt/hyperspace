@@ -91,8 +91,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
     var data = state.players[id];
     if (this.ships[id]) {
       console.log("Updating ship");
-      this.ships[id].center.x = data.x;
-      this.ships[id].center.y = data.y;
+      this.ships[id].center = data.position;
     } else {
       if (data.id === this.playerId) {
         console.log("Adding own ship");
@@ -109,9 +108,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
     var data = state.projectiles[id];
     if (this.projectiles[id]) {
       console.log("Updating projectile");
-      this.projectiles[data.id].center.x = data.position.x;
-      this.projectiles[data.id].center.y = data.position.y;
-      console.log(this.projectiles[data.id])
+      this.projectiles[data.id].center = data.position;
     } else {
       console.log("Adding projectile");
       this.addProjectile(data);
@@ -144,7 +141,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
   var ship = this.c.entities.create(Ship, {
-    center: { x: data.x, y: data.y },
+    center: data.position,
     id: data.id,
     color:"#f07",
 
@@ -223,7 +220,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
 Hyperspace.prototype.addEnemyShip = function(data) {
   var ship = this.c.entities.create(Ship, {
     id: data.id,
-    center: { x: data.x, y: data.y },
+    center: data.position,
     color:"#0f7"
   });
   this.ships[data.id] = ship;

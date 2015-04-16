@@ -11,8 +11,9 @@ type Message struct {
 
 // like a message, but for internal use to avoid the extra serialization passes
 type Event struct {
-	Type string
-	Data interface{}
+	Type     string
+	PlayerId string
+	Data     interface{}
 }
 
 type PositionData struct {
@@ -36,9 +37,9 @@ type UpdateData struct {
 }
 
 type PlayerData struct {
-	Id string  `json:"id"`
-	X  float64 `json:"x"`
-	Y  float64 `json:"y"`
+	Id       string        `json:"id"`
+	Position *PositionData `json:"position"`
+	Angle    float64       `json:"angle"`
 }
 
 type FireData struct {
