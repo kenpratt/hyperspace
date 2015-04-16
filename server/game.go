@@ -18,7 +18,7 @@ type Game struct {
 	unregister chan *Client
 
 	// Inbound events from the clients/AIs.
-	events chan *Event
+	events chan interface{}
 
 	// Game objects that currently exist
 	ships       map[string]*Ship
@@ -45,7 +45,7 @@ var game = Game{
 	clients:     make(map[*Client]bool),
 	register:    make(chan *Client),
 	unregister:  make(chan *Client),
-	events:      make(chan *Event),
+	events:      make(chan interface{}),
 	ships:       make(map[string]*Ship),
 	projectiles: make(map[string]*Projectile),
 }
@@ -90,27 +90,28 @@ func (g *Game) run() {
 	}
 }
 
-func (g *Game) applyEvent(e *Event) error {
-	s := g.ships[e.PlayerId]
-	if s == nil {
-		return GameError{"Ship doesn't exist for player"}
-	}
+func (g *Game) applyEvent(o interface{}) error {
+	switch e := o.(type) {
+	case *PositionEvent:
+		s := g.ships[e.PlayerId]
+		if s == nil {
+			return GameError{"Ship doesn't exist for player"}
+		}
 
-	switch e.Type {
-	case "position":
 		// TODO change movement to be based on start/stop/rotate instead of position updates
-		data := e.Data.(*PositionData)
-
 		// move the player
-		s.Position.X = data.X
-		s.Position.Y = data.X
+		s.Position.X = e.Position.X
+		s.Position.Y = e.Position.Y
 		return nil
-	case "fire":
-		data := e.Data.(*FireData)
+	case *FireEvent:
+		s := g.ships[e.PlayerId]
+		if s == nil {
+			return GameError{"Ship doesn't exist for player"}
+		}
 
 		// create a projectile and spawn goroutine to move it forward (TODO switch to game loop)
 		pos := &Position{X: s.Position.X, Y: s.Position.Y}
-		projectile := Projectile{Id: data.ProjectileId, Angle: 0, Position: pos}
+		projectile := Projectile{Id: e.ProjectileId, Angle: 0, Position: pos}
 		g.projectiles[projectile.Id] = &projectile
 		go func() {
 			// TODO get rid of this goroutine, and move logic into a game loop that updates all physics at the same time

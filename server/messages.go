@@ -12,15 +12,6 @@ type Message struct {
 	Data *json.RawMessage `json:"data"`
 }
 
-// Like a message, but for internal use to avoid the extra serialization passes.
-// TODO: could we get rid of the event type, and just have FireEvent, MoveEvent, ...? (and switch on type?)
-type Event struct {
-	Type     string
-	Time     float64
-	PlayerId string
-	Data     interface{}
-}
-
 type InitData struct {
 	PlayerId string      `json:"playerId"`
 	State    *UpdateData `json:"state"`

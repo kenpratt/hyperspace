@@ -62,7 +62,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		game.events <- &Event{"position", message.Time, c.playerId, &data}
+		game.events <- &PositionEvent{c.playerId, message.Time, &Position{data.X, data.Y}}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -70,7 +70,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		game.events <- &Event{"fire", message.Time, c.playerId, &data}
+		game.events <- &FireEvent{c.playerId, message.Time, data.ProjectileId}
 	}
 
 }
