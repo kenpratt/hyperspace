@@ -55,14 +55,24 @@ func (c *Client) run() {
 
 func (c *Client) handleMessage(message *Message) {
 	switch message.Type {
-	case "position":
-		var data PositionData
+	case "changeAcceleration":
+		var data AccelerationData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		game.events <- &PositionEvent{c.playerId, message.Time, &Position{data.X, data.Y}}
+		log.Println("got acceleration message", data)
+		game.events <- &ChangeAccelerationEvent{c.playerId, message.Time, data.Direction}
+	case "changeRotation":
+		var data RotationData
+		err := json.Unmarshal([]byte(*message.Data), &data)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("got rotation message", data)
+		game.events <- &ChangeRotationEvent{c.playerId, message.Time, data.Direction}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -91,17 +92,23 @@ func (g *Game) run() {
 }
 
 func (g *Game) applyEvent(o interface{}) error {
+	log.Println("applyEvent", reflect.TypeOf(o), o)
 	switch e := o.(type) {
-	case *PositionEvent:
+	case *ChangeAccelerationEvent:
 		s := g.ships[e.PlayerId]
 		if s == nil {
 			return GameError{"Ship doesn't exist for player"}
 		}
 
-		// TODO change movement to be based on start/stop/rotate instead of position updates
-		// move the player
-		s.Position.X = e.Position.X
-		s.Position.Y = e.Position.Y
+		s.Acceleration = e.Direction
+		return nil
+	case *ChangeRotationEvent:
+		s := g.ships[e.PlayerId]
+		if s == nil {
+			return GameError{"Ship doesn't exist for player"}
+		}
+
+		s.Rotation = e.Direction
 		return nil
 	case *FireEvent:
 		s := g.ships[e.PlayerId]

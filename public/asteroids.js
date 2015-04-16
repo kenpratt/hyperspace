@@ -200,15 +200,13 @@ Hyperspace.prototype.addOwnShip = function(data) {
       }
 
       // Send server events for key press changes.
-      if (JSON.stringify(last_pressed) != JSON.stringify(this.pressed)) {
-        this.conn.send("button", {
-          id: this.id,
-          time: Date.now(),
-          forward: this.pressed['forward'],
-          down: this.pressed['down'],
-          left: this.pressed['left'],
-          right: this.pressed['right'],
-        });
+      if (last_pressed['forward'] !== this.pressed['forward']) {
+        this.conn.send("changeAcceleration", { direction: this.pressed['forward'] ? 1 : 0 });
+      }
+
+      if (last_pressed['left'] !== this.pressed['left'] || last_pressed['right'] !== this.pressed['right']) {
+        var direction = (this.pressed['left'] ? -1 : (this.pressed['right'] ? 1 : 0));
+        this.conn.send("changeRotation", { direction: direction });
       }
 
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar

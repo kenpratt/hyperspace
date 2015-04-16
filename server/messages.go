@@ -26,7 +26,10 @@ type FireData struct {
 	ProjectileId string `json:"projectileId"`
 }
 
-type PositionData struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+type AccelerationData struct {
+	Direction float64 `json:"direction"`
+}
+
+type RotationData struct {
+	Direction float64 `json:"direction"`
 }
