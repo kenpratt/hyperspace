@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"time"
 )
 
 type Position struct {
@@ -30,4 +31,8 @@ func UnitVector(vector *Vector) *Vector {
 		X: (vector.X / Magnitude(vector)),
 		Y: (vector.Y / Magnitude(vector)),
 	}
+}
+
+func makeTimestamp() float64 {
+	return float64(time.Now().UnixNano() / int64(time.Millisecond))
 }

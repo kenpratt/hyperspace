@@ -202,7 +202,6 @@ Hyperspace.prototype.addOwnShip = function(data) {
           var projectileId = this.id + "." + Date.now();
           this.conn.send("fire", {
             id: projectileId,
-            time: Date.now(),
           });
 
           this.game.addProjectile({
@@ -351,7 +350,7 @@ ServerConnection.prototype.onMessage = function(ev) {
 };
 
 ServerConnection.prototype.send = function(type, data) {
-  var msg = JSON.stringify({ type: type, data: data });
+  var msg = JSON.stringify({ type: type, time: Date.now(), data: data });
   if (this.socket.readyState === this.socket.OPEN) {
     // console.log("websocket sending message", type, data);
     this.socket.send(msg);
