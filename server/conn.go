@@ -90,11 +90,12 @@ func (c *Connection) readPump() {
 			pos := &PositionData{X: 0, Y: 0}
 			projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
 			go func() {
-				for {
+				for i := 0; i < 1000; i++ {
 					projectile.UpdateOneTick()
 					b, _ := json.Marshal(projectile)
 					raw := json.RawMessage(b)
 					h.broadcast <- &Message{"fire", &raw}
+					time.Sleep(time.Duration(25) * time.Millisecond)
 				}
 			}()
 		}
