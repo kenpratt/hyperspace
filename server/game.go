@@ -108,7 +108,7 @@ func (g *Game) applyEvent(e *Event) error {
 		data := e.Data.(*FireData)
 
 		// create a projectile and spawn goroutine to move it forward (TODO switch to game loop)
-		pos := &PositionData{X: 0, Y: 0}
+		pos := &PositionData{X: p.Position.X, Y: p.Position.Y}
 		projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
 		g.projectiles[projectile.Id] = &projectile
 		go func() {
