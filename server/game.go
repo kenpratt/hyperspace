@@ -159,7 +159,6 @@ func (g *Game) cleanup() error {
 
 	for k, v := range g.projectiles {
 		if !v.Alive() {
-			log.Println("killing", k, v)
 			dead = append(dead, k)
 		}
 	}
