@@ -13,8 +13,9 @@ type Message struct {
 }
 
 type InitData struct {
-	PlayerId string      `json:"playerId"`
-	State    *UpdateData `json:"state"`
+	PlayerId  string         `json:"playerId"`
+	Constants *GameConstants `json:"constants"`
+	State     *UpdateData    `json:"state"`
 }
 
 type UpdateData struct {

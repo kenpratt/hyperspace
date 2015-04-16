@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"reflect"
 	"strconv"
 	"time"
 )
 
 type Game struct {
+	// all the important game variables
+	constants *GameConstants
+
 	// Registered clients.
 	clients map[*Client]bool
 
@@ -27,6 +29,12 @@ type Game struct {
 
 	// Next valid game object id.
 	nextId int
+}
+
+type GameConstants struct {
+	ShipAcceleration float64 `json:"ship_acceleration"`
+	ShipRotation     float64 `json:"ship_rotation"`
+	ProjectileSpeed  float64 `json:"projectile_speed"`
 }
 
 type GameError struct {
@@ -49,6 +57,13 @@ var game = Game{
 	events:      make(chan interface{}),
 	ships:       make(map[string]*Ship),
 	projectiles: make(map[string]*Projectile),
+
+	// game constants, values per second
+	constants: &GameConstants{
+		ShipAcceleration: 100, // pixels per second
+		ShipRotation:     100, // degrees per second
+		ProjectileSpeed:  150, // pixels per second
+	},
 }
 
 func (g *Game) run() {
@@ -71,13 +86,13 @@ func (g *Game) run() {
 			g.ships[id] = s
 
 			// send game state dump to player
-			c.Initialize(id, g.fullState())
+			c.Initialize(id, g.constants, g.fullState())
 		case c := <-g.unregister:
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
 
-			// TODO mark the ship as dead, and then after a time, delete them from the list of ships
+			// TODO: mark the ship as dead, and then after a time, delete them from the list of ships
 			// delete(g.ships, c.shipId)
 		case e := <-g.events:
 			err := g.applyEvent(e)
@@ -86,11 +101,13 @@ func (g *Game) run() {
 				continue
 			}
 		case <-ticker.C:
+			// TODO: calculate real elapsed time
+			elapsed := 0.1 // in seconds
 			for _, o := range g.ships {
-				o.Tick()
+				o.Tick(elapsed)
 			}
 			for _, o := range g.projectiles {
-				o.Tick()
+				o.Tick(elapsed)
 			}
 			g.broadcastUpdate()
 		}
@@ -98,7 +115,6 @@ func (g *Game) run() {
 }
 
 func (g *Game) applyEvent(o interface{}) error {
-	log.Println("applyEvent", reflect.TypeOf(o), o)
 	switch e := o.(type) {
 	case *ChangeAccelerationEvent:
 		s := g.ships[e.PlayerId]

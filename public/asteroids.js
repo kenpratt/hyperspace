@@ -54,6 +54,7 @@ var Hyperspace = function() {
   this.conn.connect();
 
   this.playerId = null;
+  this.constants = null;
   this.ships = {};
   this.projectiles = {};
 
@@ -77,6 +78,7 @@ var Hyperspace = function() {
 
   this.conn.handle("init", function(data) {
     this.playerId = data.playerId;
+    this.constants = data.constants;
     this.handleUpdate(data.state);
   }.bind(this));
 
@@ -155,7 +157,8 @@ Hyperspace.prototype.addOwnShip = function(data) {
 
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
-    update: function() {
+    update: function(elapsedMillis) {
+      var elapsed = elapsedMillis / 1000;
 
       // This keeps the players ship always in the center.
       this.c.renderer.setViewCenter(this.center);
@@ -188,17 +191,17 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Back and forth movement
       if (this.pressed["forward"]) {
         var vector = utils.angleToVector(this.angle);
-        this.center.x += vector.x;
-        this.center.y += vector.y;
+        this.center.x += vector.x * this.game.constants.ship_acceleration * elapsed;
+        this.center.y += vector.y * this.game.constants.ship_acceleration * elapsed;
       } else if (this.pressed["down"]) {
         // TODO(icco): Support breaking.
       }
 
       // Turning.
       if (this.pressed["right"]) {
-        this.angle += 2;
+        this.angle += this.game.constants.ship_rotation * elapsed;
       } else if (this.pressed["left"]) {
-        this.angle -= 2;
+        this.angle -= this.game.constants.ship_rotation * elapsed;
       }
 
       // Send server events for key press changes.
@@ -297,6 +300,7 @@ var Ship = function(game, settings) {
 };
 
 var Laser = function(game, settings) {
+  this.game = game;
   this.c = game.c;
   this.conn = game.conn;
   this.boundingBox = this.c.collider.CIRCLE;
@@ -307,13 +311,15 @@ var Laser = function(game, settings) {
     this[i] = settings[i];
   }
 
-  this.update = function() {
+  this.update = function(elapsedMillis) {
+    var elapsed = elapsedMillis / 1000;
+
     // TODO move age logic to server
     var age = 0; // Date.now() - this.created;
     // Kill lazers older than three seconds.
     if (age < 3000) {
-      this.center.x += (this.vector.x * 2);
-      this.center.y += (this.vector.y * 2);
+      this.center.x += this.vector.x * this.game.constants.projectile_speed * elapsed;
+      this.center.y += this.vector.y * this.game.constants.projectile_speed * elapsed;
     } else {
       this.c.entities.destroy(this);
     }

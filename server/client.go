@@ -20,11 +20,11 @@ func makeClient(conn *Connection) *Client {
 	return c
 }
 
-func (c *Client) Initialize(playerId string, gameState *UpdateData) {
+func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameState *UpdateData) {
 	c.playerId = playerId
 
 	// send initial player data to client
-	b, err := json.Marshal(&InitData{playerId, gameState})
+	b, err := json.Marshal(&InitData{playerId, gameConstants, gameState})
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,6 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		log.Println("got acceleration message", data)
 		game.events <- &ChangeAccelerationEvent{c.playerId, message.Time, data.Direction}
 	case "changeRotation":
 		var data RotationData
@@ -71,7 +70,6 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		log.Println("got rotation message", data)
 		game.events <- &ChangeRotationEvent{c.playerId, message.Time, data.Direction}
 	case "fire":
 		var data FireData

@@ -10,9 +10,9 @@ func (p *Projectile) Vector() *Vector {
 	return AngleToVector(p.Angle)
 }
 
-func (p *Projectile) Tick() {
+func (p *Projectile) Tick(t float64) {
 	p.Position = &Position{
-		X: p.Position.X + p.Vector().X,
-		Y: p.Position.Y + p.Vector().Y,
+		X: p.Position.X + p.Vector().X*game.constants.ProjectileSpeed*t,
+		Y: p.Position.Y + p.Vector().Y*game.constants.ProjectileSpeed*t,
 	}
 }

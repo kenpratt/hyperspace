@@ -1,9 +1,5 @@
 package main
 
-import (
-	"log"
-)
-
 type Ship struct {
 	Id           string    `json:"id"`
 	Position     *Position `json:"position"`
@@ -16,16 +12,15 @@ func (s *Ship) Vector() *Vector {
 	return AngleToVector(s.Angle)
 }
 
-func (s *Ship) Tick() {
+func (s *Ship) Tick(t float64) {
 	if s.Rotation != 0 {
-		s.Angle += s.Rotation * 2
+		s.Angle += s.Rotation * game.constants.ShipRotation * t
 	}
 
 	if s.Acceleration == 1 {
-		log.Println("accelerating", s.Angle, s.Vector(), s.Position)
 		s.Position = &Position{
-			X: s.Position.X + s.Vector().X*5,
-			Y: s.Position.Y + s.Vector().Y*5,
+			X: s.Position.X + s.Vector().X*game.constants.ShipAcceleration*t,
+			Y: s.Position.Y + s.Vector().Y*game.constants.ShipAcceleration*t,
 		}
 	}
 }
