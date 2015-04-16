@@ -90,8 +90,9 @@ Hyperspace.prototype.handleUpdate = function(state) {
   for (id in state.ships) {
     var data = state.ships[id];
     if (this.ships[id]) {
-      console.log("Updating ship");
+      console.log("Updating ship", data);
       this.ships[id].center = data.position;
+      this.ships[id].angle = data.angle;
     } else {
       if (data.id === this.playerId) {
         console.log("Adding own ship");
@@ -107,8 +108,9 @@ Hyperspace.prototype.handleUpdate = function(state) {
   for (id in state.projectiles) {
     var data = state.projectiles[id];
     if (this.projectiles[id]) {
-      console.log("Updating projectile");
+      console.log("Updating projectile", data);
       this.projectiles[data.id].center = data.position;
+      this.projectiles[data.id].angle = data.angle;
     } else {
       console.log("Adding projectile");
       this.addProjectile(data);

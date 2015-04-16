@@ -86,6 +86,12 @@ func (g *Game) run() {
 				continue
 			}
 		case <-ticker.C:
+			for _, o := range g.ships {
+				o.Tick()
+			}
+			for _, o := range g.projectiles {
+				o.Tick()
+			}
 			g.broadcastUpdate()
 		}
 	}
@@ -120,15 +126,6 @@ func (g *Game) applyEvent(o interface{}) error {
 		pos := &Position{X: s.Position.X, Y: s.Position.Y}
 		projectile := Projectile{Id: e.ProjectileId, Angle: 0, Position: pos}
 		g.projectiles[projectile.Id] = &projectile
-		go func() {
-			// TODO get rid of this goroutine, and move logic into a game loop that updates all physics at the same time
-			// TODO handle projectile death in a nicer way
-			for i := 0; i < 1000; i++ {
-				projectile.UpdateOneTick()
-				g.broadcastUpdate()
-				time.Sleep(time.Duration(25) * time.Millisecond)
-			}
-		}()
 		return nil
 	default:
 		return GameError{"Don't know how to apply event"}

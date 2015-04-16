@@ -10,7 +10,7 @@ func (p *Projectile) Vector() *Vector {
 	return AngleToVector(p.Angle)
 }
 
-func (p *Projectile) UpdateOneTick() {
+func (p *Projectile) Tick() {
 	p.Position = &Position{
 		X: p.Position.X + p.Vector().X,
 		Y: p.Position.Y + p.Vector().Y,
