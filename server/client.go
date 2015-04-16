@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// A Client is a connected player and associated websocket connection.
 type Client struct {
 	// WebSocket connection (communicate with this via send and receive channels)
 	conn *Connection
