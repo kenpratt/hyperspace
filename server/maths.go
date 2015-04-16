@@ -4,6 +4,16 @@ import (
 	"math"
 )
 
+type Position struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
+type Vector struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+}
+
 // Converts an angle in degrees between 0 and 360.
 func AngleToVector(angle float64) *Vector {
 	// Convert to radians.

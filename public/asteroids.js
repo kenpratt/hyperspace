@@ -87,8 +87,8 @@ var Hyperspace = function() {
 
 Hyperspace.prototype.handleUpdate = function(state) {
   // add/update ships
-  for (id in state.players) {
-    var data = state.players[id];
+  for (id in state.ships) {
+    var data = state.ships[id];
     if (this.ships[id]) {
       console.log("Updating ship");
       this.ships[id].center = data.position;
