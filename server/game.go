@@ -102,7 +102,7 @@ func (g *Game) run() {
 			}
 		case <-ticker.C:
 			// TODO: calculate real elapsed time
-			elapsed := 0.1 // in seconds
+			var elapsed uint64 = 100 // in milliseconds
 			for _, o := range g.ships {
 				o.Tick(elapsed)
 			}
