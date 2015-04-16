@@ -110,7 +110,7 @@ func (g *Game) applyEvent(e *Event) error {
 
 		// create a projectile and spawn goroutine to move it forward (TODO switch to game loop)
 		pos := &Position{X: s.Position.X, Y: s.Position.Y}
-		projectile := Projectile{Id: data.Id, Angle: 0, Position: pos}
+		projectile := Projectile{Id: data.ProjectileId, Angle: 0, Position: pos}
 		g.projectiles[projectile.Id] = &projectile
 		go func() {
 			// TODO get rid of this goroutine, and move logic into a game loop that updates all physics at the same time

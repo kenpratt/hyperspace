@@ -32,7 +32,7 @@ type UpdateData struct {
 }
 
 type FireData struct {
-	Id string `json:"id"`
+	ProjectileId string `json:"projectileId"`
 }
 
 type PositionData struct {

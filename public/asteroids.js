@@ -201,7 +201,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
           // happened.
           var projectileId = this.id + "." + Date.now();
           this.conn.send("fire", {
-            id: projectileId,
+            projectileId: projectileId,
           });
 
           this.game.addProjectile({
