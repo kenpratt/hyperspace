@@ -32,9 +32,9 @@ type Game struct {
 }
 
 type GameConstants struct {
-	ShipAcceleration float64 `json:"ship_acceleration"`
-	ShipRotation     float64 `json:"ship_rotation"`
-	ProjectileSpeed  float64 `json:"projectile_speed"`
+	ShipAcceleration uint16 `json:"ship_acceleration"`
+	ShipRotation     uint16 `json:"ship_rotation"`
+	ProjectileSpeed  uint16 `json:"projectile_speed"`
 }
 
 type GameError struct {

@@ -6,8 +6,8 @@ import (
 )
 
 type Position struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	X int64 `json:"x"`
+	Y int64 `json:"y"`
 }
 
 type Vector struct {
@@ -15,10 +15,12 @@ type Vector struct {
 	Y float64 `json:"y"`
 }
 
+type Angle uint16
+
 // Converts an angle in degrees between 0 and 360.
-func AngleToVector(angle float64) *Vector {
+func AngleToVector(angle Angle) *Vector {
 	// Convert to radians.
-	r := angle * 0.01745
+	r := float64(angle) * 0.01745
 	return UnitVector(&Vector{X: math.Sin(r), Y: -math.Cos(r)})
 }
 
@@ -33,6 +35,6 @@ func UnitVector(vector *Vector) *Vector {
 	}
 }
 
-func makeTimestamp() float64 {
-	return float64(time.Now().UnixNano() / int64(time.Millisecond))
+func makeTimestamp() uint64 {
+	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }

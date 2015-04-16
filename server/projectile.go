@@ -3,7 +3,7 @@ package main
 type Projectile struct {
 	Id       string    `json:"id"`
 	Position *Position `json:"position"`
-	Angle    float64   `json:"angle"`
+	Angle    Angle     `json:"angle"`
 }
 
 func (p *Projectile) Vector() *Vector {
@@ -11,8 +11,8 @@ func (p *Projectile) Vector() *Vector {
 }
 
 func (p *Projectile) Tick(t float64) {
-	p.Position = &Position{
-		X: p.Position.X + p.Vector().X*game.constants.ProjectileSpeed*t,
-		Y: p.Position.Y + p.Vector().Y*game.constants.ProjectileSpeed*t,
-	}
+	v := p.Vector()
+	amount := t * float64(game.constants.ProjectileSpeed)
+	p.Position.X += int64(v.X * amount)
+	p.Position.Y += int64(v.Y * amount)
 }

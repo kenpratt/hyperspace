@@ -8,7 +8,7 @@ import (
 
 type Message struct {
 	Type string           `json:"type"`
-	Time float64          `json:"time"`
+	Time uint64           `json:"time"`
 	Data *json.RawMessage `json:"data"`
 }
 
@@ -28,9 +28,9 @@ type FireData struct {
 }
 
 type AccelerationData struct {
-	Direction float64 `json:"direction"`
+	Direction int8 `json:"direction"`
 }
 
 type RotationData struct {
-	Direction float64 `json:"direction"`
+	Direction int8 `json:"direction"`
 }
