@@ -19,7 +19,7 @@ func (s *Ship) Tick(t float64) {
 	}
 
 	v := s.Vector()
-	amount = t * float64(game.constants.ProjectileSpeed)
+	amount = t * float64(game.constants.ShipAcceleration)
 	if s.Acceleration == 1 {
 		s.Position.X += int64(v.X * amount)
 		s.Position.Y += int64(v.Y * amount)
