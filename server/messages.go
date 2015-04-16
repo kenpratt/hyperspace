@@ -19,30 +19,14 @@ type Event struct {
 	Data     interface{}
 }
 
-type PositionData struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
-}
-
-type Vector struct {
-	X float64
-	Y float64
-}
-
 type InitData struct {
 	PlayerId string      `json:"playerId"`
 	State    *UpdateData `json:"state"`
 }
 
 type UpdateData struct {
-	Players     map[string]*PlayerData     `json:"players"`
-	Projectiles map[string]*ProjectileData `json:"projectiles"`
-}
-
-type PlayerData struct {
-	Id       string        `json:"id"`
-	Position *PositionData `json:"position"`
-	Angle    float64       `json:"angle"`
+	Ships       map[string]*Ship       `json:"ships"`
+	Projectiles map[string]*Projectile `json:"projectiles"`
 }
 
 type FireData struct {
@@ -50,19 +34,7 @@ type FireData struct {
 	Time float64 `json:"time"`
 }
 
-type ProjectileData struct {
-	Id       string        `json:"id"`
-	Position *PositionData `json:"position"`
-	Angle    float64       `json:"angle"`
-}
-
-func (p *ProjectileData) Vector() *Vector {
-	return AngleToVector(p.Angle)
-}
-
-func (p *ProjectileData) UpdateOneTick() {
-	p.Position = &PositionData{
-		X: p.Position.X + p.Vector().X,
-		Y: p.Position.Y + p.Vector().Y,
-	}
+type PositionData struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
