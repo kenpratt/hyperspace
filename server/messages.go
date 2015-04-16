@@ -8,6 +8,7 @@ import (
 
 type Message struct {
 	Type string           `json:"type"`
+	Time float64          `json:"time"`
 	Data *json.RawMessage `json:"data"`
 }
 
@@ -15,6 +16,7 @@ type Message struct {
 // TODO: could we get rid of the event type, and just have FireEvent, MoveEvent, ...? (and switch on type?)
 type Event struct {
 	Type     string
+	Time     float64
 	PlayerId string
 	Data     interface{}
 }
@@ -30,8 +32,7 @@ type UpdateData struct {
 }
 
 type FireData struct {
-	Id   string  `json:"id"`
-	Time float64 `json:"time"`
+	ProjectileId string `json:"projectileId"`
 }
 
 type PositionData struct {

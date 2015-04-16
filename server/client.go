@@ -29,7 +29,7 @@ func (c *Client) Initialize(playerId string, gameState *UpdateData) {
 		panic(err)
 	}
 	raw := json.RawMessage(b)
-	c.Send(&Message{"init", &raw})
+	c.Send(&Message{"init", makeTimestamp(), &raw})
 
 	// boot client message handler
 	go c.run()
@@ -62,7 +62,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		game.events <- &Event{"position", c.playerId, &data}
+		game.events <- &Event{"position", message.Time, c.playerId, &data}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -70,7 +70,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		game.events <- &Event{"fire", c.playerId, &data}
+		game.events <- &Event{"fire", message.Time, c.playerId, &data}
 	}
 
 }
