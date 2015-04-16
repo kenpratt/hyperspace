@@ -144,6 +144,12 @@ Hyperspace.prototype.addOwnShip = function(data) {
     center: data.position,
     id: data.id,
     color:"#f07",
+    pressed: {
+      forward: false,
+      down: false,
+      left: false,
+      right: false,
+    },
 
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
@@ -152,45 +158,57 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // This keeps the players ship always in the center.
       this.c.renderer.setViewCenter(this.center);
 
+      var last_pressed = {};
+      for (i in this.pressed) {
+        last_pressed[i] = this.pressed[i];
+      }
+
+      // The range of Angle is 0 - 360.
       this.angle %= 360;
 
       // Key pressed booleans
-      var forward_pressed =
+      this.pressed["forward"] =
         this.c.inputter.isDown(this.c.inputter.UP_ARROW) ||
         this.c.inputter.isDown(this.c.inputter.W) ||
         this.c.inputter.isDown(this.c.inputter.COMMA);
-      var down_pressed =
+      this.pressed["down"] =
         this.c.inputter.isDown(this.c.inputter.DOWN_ARROW) ||
         this.c.inputter.isDown(this.c.inputter.S) ||
         this.c.inputter.isDown(this.c.inputter.O);
-      var left_pressed =
+      this.pressed["left"] =
         this.c.inputter.isDown(this.c.inputter.LEFT_ARROW) ||
         this.c.inputter.isDown(this.c.inputter.A);
-      var right_pressed =
+      this.pressed["right"] =
         this.c.inputter.isDown(this.c.inputter.RIGHT_ARROW) ||
         this.c.inputter.isDown(this.c.inputter.D) ||
         this.c.inputter.isDown(this.c.inputter.E);
 
       // Back and forth movement
-      if (forward_pressed) {
+      if (this.pressed["forward"]) {
         var vector = utils.angleToVector(this.angle);
         this.center.x += vector.x;
         this.center.y += vector.y;
-      } else if (down_pressed) {
+      } else if (this.pressed["down"]) {
         // TODO(icco): Support breaking.
       }
 
       // Turning.
-      if (right_pressed) {
+      if (this.pressed["right"]) {
         this.angle += 2;
-      } else if (left_pressed) {
+      } else if (this.pressed["left"]) {
         this.angle -= 2;
       }
 
-      if (this.lastX !== this.center.x || this.lastY !== this.center.y) {
-        this.lastX = this.center.x;
-        this.lastY = this.center.y;
-        this.conn.send("position", this.center);
+      // Send server events for key press changes.
+      if (JSON.stringify(last_pressed) != JSON.stringify(this.pressed)) {
+        this.conn.send("button", {
+          id: this.id,
+          time: Date.now(),
+          forward: this.pressed['forward'],
+          down: this.pressed['down'],
+          left: this.pressed['left'],
+          right: this.pressed['right'],
+        });
       }
 
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
@@ -295,7 +313,6 @@ var Laser = function(game, settings) {
     var age = 0; // Date.now() - this.created;
     // Kill lazers older than three seconds.
     if (age < 3000) {
-      console.log("hum", this.center, this.vector);
       this.center.x += (this.vector.x * 2);
       this.center.y += (this.vector.y * 2);
     } else {
