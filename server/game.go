@@ -8,7 +8,7 @@ import (
 )
 
 type Game struct {
-	// all the important game variables
+	// All the important game variables
 	constants *GameConstants
 
 	// Registered clients.
@@ -49,7 +49,7 @@ const (
 	updatePeriod = 100 * time.Millisecond
 )
 
-// TODO get this working without a global variable, I guess pass a ref to game into the web socket handler function?
+// TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
 var game = Game{
 	clients:     make(map[*Client]bool),
 	register:    make(chan *Client),
@@ -58,11 +58,11 @@ var game = Game{
 	ships:       make(map[string]*Ship),
 	projectiles: make(map[string]*Projectile),
 
-	// game constants, values per second
+	// Game constants, values per second
 	constants: &GameConstants{
-		ShipAcceleration: 100, // pixels per second
-		ShipRotation:     100, // degrees per second
-		ProjectileSpeed:  150, // pixels per second
+		ShipAcceleration: 100, // Pixels per second
+		ShipRotation:     100, // Degrees per second
+		ProjectileSpeed:  150, // Pixels per second
 	},
 }
 
@@ -75,24 +75,24 @@ func (g *Game) run() {
 	for {
 		select {
 		case c := <-g.register:
-			// register client
+			// Register client
 			g.clients[c] = true
 
-			// create ship
+			// Create ship
 			g.nextId++
 			id := strconv.Itoa(g.nextId)
 			pos := &Position{X: 256, Y: 110}
 			s := &Ship{Id: id, Angle: 0, Position: pos}
 			g.ships[id] = s
 
-			// send game state dump to player
+			// Send game state dump to player
 			c.Initialize(id, g.constants, g.fullState())
 		case c := <-g.unregister:
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
 
-			// TODO: mark the ship as dead, and then after a time, delete them from the list of ships
+			// TODO: Mark the ship as dead, and then after a time, delete them from the list of ships.
 			// delete(g.ships, c.shipId)
 		case e := <-g.events:
 			err := g.applyEvent(e)
@@ -101,8 +101,8 @@ func (g *Game) run() {
 				continue
 			}
 		case <-ticker.C:
-			// TODO: calculate real elapsed time
-			var elapsed uint64 = 100 // in milliseconds
+			// TODO: Calculate actual elapsed time.
+			var elapsed uint64 = 100 // (milliseconds)
 			for _, o := range g.ships {
 				o.Tick(elapsed)
 			}
@@ -138,9 +138,8 @@ func (g *Game) applyEvent(o interface{}) error {
 			return GameError{"Ship doesn't exist for player"}
 		}
 
-		// create a projectile and spawn goroutine to move it forward (TODO switch to game loop)
-		pos := &Position{X: s.Position.X, Y: s.Position.Y}
-		projectile := Projectile{Id: e.ProjectileId, Angle: s.Angle, Position: pos}
+		pos := *s.Position // Clone ship position
+		projectile := Projectile{Id: e.ProjectileId, Angle: s.Angle, Position: &pos}
 		g.projectiles[projectile.Id] = &projectile
 		return nil
 	default:
