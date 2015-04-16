@@ -1,11 +1,13 @@
 package main
 
+import (
+	"encoding/json"
+	"log"
+)
+
 type Game struct {
 	// Registered clients.
 	clients map[*Client]bool
-
-	// Inbound messages from the clients.
-	broadcast chan *Message
 
 	// Register requests from the clients.
 	register chan *Client
@@ -13,16 +15,27 @@ type Game struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
+	// Inbound events from the clients/AIs.
+	events chan *Event
+
 	// Next valid game object id.
 	nextId uint16
 }
 
+type GameError struct {
+	What string
+}
+
+func (e GameError) Error() string {
+	return e.What
+}
+
 // TODO get this working without a global variable, I guess pass a ref to game into the web socket handler function?
 var game = Game{
-	broadcast:  make(chan *Message),
+	clients:    make(map[*Client]bool),
 	register:   make(chan *Client),
 	unregister: make(chan *Client),
-	clients:    make(map[*Client]bool),
+	events:     make(chan *Event),
 }
 
 func (g *Game) run() {
@@ -36,10 +49,34 @@ func (g *Game) run() {
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
-		case m := <-g.broadcast:
+		case e := <-g.events:
+			updates, err := g.applyEvent(e)
+			if err != nil {
+				log.Println("Error applying event", e, err)
+				continue
+			}
+
 			for c := range g.clients {
-				c.Send(m)
+				c.Send(updates)
 			}
 		}
 	}
+}
+
+func (g *Game) applyEvent(e *Event) (*Message, error) {
+	switch e.Type {
+	case "position":
+		data := e.Data.(*PlayerData)
+		b, _ := json.Marshal(*data)
+		raw := json.RawMessage(b)
+		return &Message{"position", &raw}, nil
+	case "fire":
+		data := e.Data.(*ProjectileData)
+		b, _ := json.Marshal(*data)
+		raw := json.RawMessage(b)
+		return &Message{"position", &raw}, nil
+	default:
+		return nil, GameError{"Don't know how to apply event"}
+	}
+
 }

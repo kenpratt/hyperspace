@@ -9,6 +9,12 @@ type Message struct {
 	Data *json.RawMessage `json:"data"`
 }
 
+// like a message, but for internal use to avoid the extra serialization passes
+type Event struct {
+	Type string
+	Data interface{}
+}
+
 type InitData struct {
 	Id uint16 `json:"id"`
 }

@@ -53,15 +53,13 @@ func (c *Client) run() {
 func (c *Client) handleMessage(message *Message) {
 	switch message.Type {
 	case "position":
-		var pos PositionData
-		err := json.Unmarshal([]byte(*message.Data), &pos)
+		var data PositionData
+		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		b, _ := json.Marshal(PlayerData{c.playerId, pos.X, pos.Y})
-		raw := json.RawMessage(b)
-		game.broadcast <- &Message{"position", &raw}
+		game.events <- &Event{"position", &PlayerData{c.playerId, data.X, data.Y}}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -75,9 +73,7 @@ func (c *Client) handleMessage(message *Message) {
 		go func() {
 			for i := 0; i < 1000; i++ {
 				projectile.UpdateOneTick()
-				b, _ := json.Marshal(projectile)
-				raw := json.RawMessage(b)
-				game.broadcast <- &Message{"fire", &raw}
+				game.events <- &Event{"fire", &projectile}
 				time.Sleep(time.Duration(25) * time.Millisecond)
 			}
 		}()

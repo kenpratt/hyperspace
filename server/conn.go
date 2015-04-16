@@ -62,12 +62,13 @@ func (c *Connection) readPump() {
 	}
 }
 
-// write writes a message with the given message type and payload.
+// write a message with the given message type and payload.
 func (c *Connection) write(mt int, payload []byte) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteMessage(mt, payload)
 }
 
+// write a JSON message.
 func (c *Connection) writeJSON(message *Message) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteJSON(message)
