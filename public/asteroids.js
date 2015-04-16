@@ -54,6 +54,8 @@ var Hyperspace = function() {
   this.conn.connect();
 
   this.playerId = null;
+  this.ships = {};
+  this.projectiles = {};
 
   this.update = function() {
     center = this.c.renderer.getViewCenter()
@@ -74,29 +76,47 @@ var Hyperspace = function() {
   };
 
   this.conn.handle("init", function(data) {
-    this.playerId = data.id;
-    this.addOwnShip(data);
+    this.playerId = data.playerId;
+    this.handleUpdate(data.state);
   }.bind(this));
 
-  this.conn.handle("position", function(data) {
-    // TODO: use map to lookup by id instead of iterating
-    var entities = this.c.entities.all(Ship);
-    var ship = null;
-    for (i in entities) {
-      if (entities[i].id === data.id) {
-        ship = entities[i];
-        break;
+  this.conn.handle("update", function(data) {
+    this.handleUpdate(data);
+  }.bind(this));
+};
+
+Hyperspace.prototype.handleUpdate = function(state) {
+  // add/update ships
+  for (id in state.players) {
+    var data = state.players[id];
+    if (this.ships[id]) {
+      console.log("Updating ship");
+      this.ships[id].center.x = data.x;
+      this.ships[id].center.y = data.y;
+    } else {
+      if (data.id === this.playerId) {
+        console.log("Adding own ship");
+        this.addOwnShip(data);
+      } else {
+        console.log("Adding enemy ship");
+        this.addEnemyShip(data);
       }
     }
+  }
 
-    if (ship) {
-      ship.center.x = data.x;
-      ship.center.y = data.y;
+  // add/update projectiles
+  for (id in state.projectiles) {
+    var data = state.projectiles[id];
+    if (this.projectiles[id]) {
+      console.log("Updating projectile");
+      this.projectiles[data.id].center.x = data.position.x;
+      this.projectiles[data.id].center.y = data.position.y;
+      console.log(this.projectiles[data.id])
     } else {
-      console.log("Adding enemy ship");
-      this.addEnemyShip(data);
+      console.log("Adding projectile");
+      this.addProjectile(data);
     }
-  }.bind(this));
+  }
 };
 
 var Star = function(game, settings) {
@@ -123,7 +143,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
-  this.c.entities.create(Ship, {
+  var ship = this.c.entities.create(Ship, {
     center: { x: data.x, y: data.y },
     id: data.id,
     color:"#f07",
@@ -179,35 +199,44 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
-
-        // Send an event (a cause of a thing) that describes what just
-        // happened.
-        this.conn.send("fire", {
-          id: this.id + "." + Date.now(),
-          time: Date.now(),
-        });
-
         if (this.c.entities.all(Laser).length < 30) {
-          this.c.entities.create(Laser, {
-            center: { x:this.center.x, y:this.center.y },
-            vector: utils.angleToVector(this.angle),
-            owner: this.id,
-            created: Date.now(),
+          // Send an event (a cause of a thing) that describes what just
+          // happened.
+          var projectileId = this.id + "." + Date.now();
+          this.conn.send("fire", {
+            id: projectileId,
+            time: Date.now(),
+          });
+
+          this.game.addProjectile({
+            id: projectileId,
+            position: { x:this.center.x, y:this.center.y },
+            angle: this.angle,
           });
         }
       }
     },
   });
+  this.ships[data.id] = ship;
 };
 
 Hyperspace.prototype.addEnemyShip = function(data) {
-  this.c.entities.create(Ship, {
+  var ship = this.c.entities.create(Ship, {
     id: data.id,
     center: { x: data.x, y: data.y },
     color:"#0f7"
   });
+  this.ships[data.id] = ship;
 };
 
+Hyperspace.prototype.addProjectile = function(data) {
+  var projectile = this.c.entities.create(Laser, {
+    id: data.id,
+    center: data.position,
+    vector: utils.angleToVector(data.angle)
+  });
+  this.projectiles[data.id] = projectile;
+};
 
 // This defines the basic ship shape as a series of verices for a path to
 // follow.
@@ -222,6 +251,7 @@ var ship_shape = [
 // The actual ship entity. One of these will be created for every single player
 // in the game. Please set the color.
 var Ship = function(game, settings) {
+  this.game = game;
   this.c = game.c;
   this.conn = game.conn;
   for (var i in settings) {
@@ -264,9 +294,11 @@ var Laser = function(game, settings) {
   }
 
   this.update = function() {
-    var age = Date.now() - this.created;
+    // TODO move age logic to server
+    var age = 0; // Date.now() - this.created;
     // Kill lazers older than three seconds.
     if (age < 3000) {
+      console.log("hum", this.center, this.vector);
       this.center.x += (this.vector.x * 2);
       this.center.y += (this.vector.y * 2);
     } else {

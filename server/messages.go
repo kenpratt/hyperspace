@@ -15,10 +15,6 @@ type Event struct {
 	Data interface{}
 }
 
-type InitData struct {
-	Id uint16 `json:"id"`
-}
-
 type PositionData struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`
@@ -29,8 +25,18 @@ type Vector struct {
 	Y float64
 }
 
+type InitData struct {
+	PlayerId string      `json:"playerId"`
+	State    *UpdateData `json:"state"`
+}
+
+type UpdateData struct {
+	Players     map[string]*PlayerData     `json:"players"`
+	Projectiles map[string]*ProjectileData `json:"projectiles"`
+}
+
 type PlayerData struct {
-	Id uint16  `json:"id"`
+	Id string  `json:"id"`
 	X  float64 `json:"x"`
 	Y  float64 `json:"y"`
 }

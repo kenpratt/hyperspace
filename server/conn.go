@@ -90,10 +90,12 @@ func (c *Connection) writePump() {
 			}
 
 			if err := c.writeJSON(message); err != nil {
+				log.Println("Error sending message:", err)
 				return
 			}
 		case <-ticker.C:
 			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
+				log.Println("Error sending ping:", err)
 				return
 			}
 		}

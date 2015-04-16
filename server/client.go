@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"time"
 )
 
 type Client struct {
@@ -11,20 +10,23 @@ type Client struct {
 	conn *Connection
 
 	// ID of the player that this client represents
-	playerId uint16
+	playerId string
 }
 
 func makeClient(conn *Connection) *Client {
-	c := &Client{conn, 0}
+	c := &Client{conn: conn}
 	game.register <- c
 	return c
 }
 
-func (c *Client) Initialize(playerId uint16) {
+func (c *Client) Initialize(playerId string, gameState *UpdateData) {
 	c.playerId = playerId
 
 	// send initial player data to client
-	b, _ := json.Marshal(PlayerData{c.playerId, 256, 110})
+	b, err := json.Marshal(&InitData{playerId, gameState})
+	if err != nil {
+		panic(err)
+	}
 	raw := json.RawMessage(b)
 	c.Send(&Message{"init", &raw})
 
@@ -67,16 +69,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 
-		// TODO: Why does this close the connection?
-		pos := &PositionData{X: 0, Y: 0}
-		projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
-		go func() {
-			for i := 0; i < 1000; i++ {
-				projectile.UpdateOneTick()
-				game.events <- &Event{"fire", &projectile}
-				time.Sleep(time.Duration(25) * time.Millisecond)
-			}
-		}()
+		game.events <- &Event{"fire", &data}
 	}
 
 }
