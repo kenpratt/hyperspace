@@ -217,20 +217,14 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
-        if (this.c.entities.all(Laser).length < 30) {
-          // Send an event (a cause of a thing) that describes what just
-          // happened.
-          var projectileId = this.id + "." + Date.now();
-          this.conn.send("fire", {
-            projectileId: projectileId,
-          });
-
-          this.game.addProjectile({
-            id: projectileId,
-            position: { x:this.center.x, y:this.center.y },
-            angle: this.angle,
-          });
-        }
+        var projectileId = this.id + "." + Date.now();
+        this.game.addProjectile({
+          id: projectileId,
+          position: { x:this.center.x, y:this.center.y },
+          angle: this.angle,
+          owner: this.id,
+          sendEvent: true,
+        });
       }
     },
   });
@@ -250,8 +244,17 @@ Hyperspace.prototype.addProjectile = function(data) {
   var projectile = this.c.entities.create(Laser, {
     id: data.id,
     center: data.position,
-    vector: utils.angleToVector(data.angle)
+    vector: utils.angleToVector(data.angle),
+    owner: data.ship_id
   });
+
+  if (data.sendEvent) {
+    // Send an event (a cause of a thing) that describes what just happened.
+    this.conn.send("fire", {
+      projectileId: projectile.id,
+      created: projectile.created,
+    });
+  }
   this.projectiles[data.id] = projectile;
 };
 
@@ -306,6 +309,7 @@ var Laser = function(game, settings) {
   this.boundingBox = this.c.collider.CIRCLE;
   this.size = { x: 3, y: 3 };
   this.zindex = -1;
+  this.created = Date.now()
 
   for (var i in settings) {
     this[i] = settings[i];

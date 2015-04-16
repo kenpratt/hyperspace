@@ -101,6 +101,12 @@ func (g *Game) run() {
 				continue
 			}
 		case <-ticker.C:
+			err := g.cleanup()
+			if err != nil {
+				log.Println("Error Cleaning Up", err)
+				continue
+			}
+
 			// TODO: calculate real elapsed time
 			elapsed := 0.1 // in seconds
 			for _, o := range g.ships {
@@ -140,13 +146,29 @@ func (g *Game) applyEvent(o interface{}) error {
 
 		// create a projectile and spawn goroutine to move it forward (TODO switch to game loop)
 		pos := &Position{X: s.Position.X, Y: s.Position.Y}
-		projectile := Projectile{Id: e.ProjectileId, Angle: s.Angle, Position: pos}
+		projectile := Projectile{Id: e.ProjectileId, Angle: s.Angle, Position: pos, Created: e.Created}
 		g.projectiles[projectile.Id] = &projectile
 		return nil
 	default:
 		return GameError{"Don't know how to apply event"}
 	}
+}
 
+func (g *Game) cleanup() error {
+	dead := []string{}
+
+	for k, v := range g.projectiles {
+		if !v.Alive() {
+			log.Println("killing", k, v)
+			dead = append(dead, k)
+		}
+	}
+
+	for i := range dead {
+		delete(g.projectiles, dead[i])
+	}
+
+	return nil
 }
 
 func (g *Game) fullState() *UpdateData {
@@ -161,7 +183,9 @@ func (g *Game) broadcastUpdate() {
 	}
 
 	raw := json.RawMessage(b)
-	m := &Message{"update", makeTimestamp(), &raw}
+	m := &Message{"update", MakeTimestamp(), &raw}
+
+	// log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
 
 	for c := range g.clients {
 		c.Send(m)

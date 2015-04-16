@@ -35,6 +35,6 @@ func UnitVector(vector *Vector) *Vector {
 	}
 }
 
-func makeTimestamp() uint64 {
+func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }

@@ -25,6 +25,7 @@ type UpdateData struct {
 
 type FireData struct {
 	ProjectileId string `json:"projectileId"`
+	Created      uint64 `json:"created"`
 }
 
 type AccelerationData struct {

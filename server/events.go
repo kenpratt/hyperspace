@@ -4,6 +4,7 @@ type FireEvent struct {
 	PlayerId     string
 	Time         uint64
 	ProjectileId string
+	Created      uint64
 }
 
 type ChangeAccelerationEvent struct {
