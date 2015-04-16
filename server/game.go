@@ -98,6 +98,7 @@ func (g *Game) applyEvent(e *Event) error {
 
 	switch e.Type {
 	case "position":
+		// TODO change movement to be based on start/stop/rotate instead of position updates
 		data := e.Data.(*PositionData)
 
 		// move the player
@@ -112,6 +113,8 @@ func (g *Game) applyEvent(e *Event) error {
 		projectile := ProjectileData{Id: data.Id, Angle: 0, Position: pos}
 		g.projectiles[projectile.Id] = &projectile
 		go func() {
+			// TODO get rid of this goroutine, and move logic into a game loop that updates all physics at the same time
+			// TODO handle projectile death in a nicer way
 			for i := 0; i < 1000; i++ {
 				projectile.UpdateOneTick()
 				g.broadcastUpdate()
