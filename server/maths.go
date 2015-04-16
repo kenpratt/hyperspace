@@ -38,3 +38,14 @@ func UnitVector(vector *Vector) *Vector {
 func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }
+
+func AmountToRotate(direction int8, speed uint16, elapsed uint64) Angle {
+	d := float64(speed) * float64(elapsed) / 1000
+	return Angle(float64(direction) * d)
+}
+
+func AmountToMove(angle Angle, speed uint16, elapsed uint64) (int64, int64) {
+	v := AngleToVector(angle)
+	d := float64(speed) * float64(elapsed) / 1000
+	return int64(v.X * d), int64(v.Y * d)
+}

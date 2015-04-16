@@ -8,7 +8,7 @@ import (
 func main() {
 	http.HandleFunc("/ws", serveWs)
 
-	// TODO restrict static file serving to dev mode
+	// TODO: Restrict static file serving to dev mode.
 	fs := http.FileServer(http.Dir("public"))
 	http.Handle("/", fs)
 

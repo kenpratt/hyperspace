@@ -10,11 +10,11 @@ type FireEvent struct {
 type ChangeAccelerationEvent struct {
 	PlayerId  string
 	Time      uint64
-	Direction int8 // TODO: try to use an int8 here (and try to switch other types to better types instead of float64 as well)
+	Direction int8
 }
 
 type ChangeRotationEvent struct {
 	PlayerId  string
 	Time      uint64
-	Direction int8 // TODO: try to use an int8 here (and try to switch other types to better types instead of float64 as well)
+	Direction int8
 }
