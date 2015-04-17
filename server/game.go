@@ -94,7 +94,7 @@ func (g *Game) run() {
 
 			// Create ship
 			id := g.generateId()
-			pos := &Position{X: 0, Y: 0}
+			pos := &Coordinate{X: 0, Y: 0}
 			s := &Ship{Id: id, Angle: 0, Position: pos}
 			g.ships[id] = s
 

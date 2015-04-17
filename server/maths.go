@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Position struct {
+type Coordinate struct {
 	X int64 `json:"x"`
 	Y int64 `json:"y"`
 }

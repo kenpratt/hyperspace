@@ -1,11 +1,11 @@
 package main
 
 type Projectile struct {
-	Id       string    `json:"id"`
-	Position *Position `json:"position"`
-	Angle    Angle     `json:"angle"`
-	Created  uint64    `json:"created"`
-	Owner    float64   `json:"owner"`
+	Id       string      `json:"id"`
+	Position *Coordinate `json:"position"`
+	Angle    Angle       `json:"angle"`
+	Created  uint64      `json:"created"`
+	Owner    float64     `json:"owner"`
 }
 
 func (p *Projectile) Tick(t uint64) {
