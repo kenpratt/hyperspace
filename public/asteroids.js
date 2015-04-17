@@ -57,6 +57,7 @@ var Hyperspace = function() {
   this.constants = null;
   this.ships = {};
   this.projectiles = {};
+  this.asteroids = {};
 
   this.update = function() {
     center = this.c.renderer.getViewCenter()
@@ -119,12 +120,27 @@ Hyperspace.prototype.handleUpdate = function(state) {
     }
   }
 
-  // TODO: This doesn't quite work yet. 
+  // TODO: This doesn't quite work yet.
   var ents = this.c.entities.all(Laser);
   for (var i in ents) {
     ent = ents[i];
     if (ent != undefined && state.projectiles[ent.id] == undefined) {
       this.c.entities.destroy(ent);
+    }
+  }
+
+
+  // add/update asteroids
+  for (id in state.asteroids) {
+    var data = state.asteroids[id];
+    if (this.asteroids[id]) {
+      // console.log("Updating asteroid", data);
+      this.asteroids[data.id].center = data.position;
+      this.asteroids[data.id].angle = data.angle;
+      this.asteroids[data.id].velocity = data.velocity;
+    } else {
+      // console.log("Adding asteroid");
+      this.addAsteroid(data);
     }
   }
 };
@@ -267,6 +283,10 @@ Hyperspace.prototype.addProjectile = function(data) {
   this.projectiles[data.id] = projectile;
 };
 
+Hyperspace.prototype.addAsteroid = function(data) {
+  this.asteroids[data.id] = this.c.entities.create(Asteroid, data);
+};
+
 // This defines the basic ship shape as a series of verices for a path to
 // follow.
 var ship_shape = [
@@ -340,6 +360,40 @@ var Laser = function(game, settings) {
 
   this.draw = function(ctx) {
     ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.arc(
+        this.center.x, // x
+        this.center.y, // y
+        this.size.x, // Radius
+        0, // Start Angle
+        Math.PI*2, // End Angle
+        true); // Anticlockwise?
+    ctx.fill();
+  };
+};
+
+var Asteroid = function(game, settings) {
+  this.game = game;
+  this.c = game.c;
+  this.conn = game.conn;
+  for (var i in settings) {
+    this[i] = settings[i];
+  }
+
+  this.boundingBox = this.c.collider.CIRCLE;
+  this.size = { x: this.width, y: this.width };
+  this.vector = utils.angleToVector(this.angle);
+  this.zindex = -1;
+  this.center = this.position;
+
+  this.update = function(elapsedMillis) {
+    var elapsed = elapsedMillis / 1000;
+    this.center.x += this.vector.x * this.velocity * elapsed;
+    this.center.y += this.vector.y * this.velocity * elapsed;
+  };
+
+  this.draw = function(ctx) {
+    ctx.fillStyle = "#f00";
     ctx.beginPath();
     ctx.arc(
         this.center.x, // x

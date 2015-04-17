@@ -26,6 +26,7 @@ type Game struct {
 	// Game objects that currently exist
 	ships       map[string]*Ship
 	projectiles map[string]*Projectile
+	asteroids   map[string]*Asteroid
 
 	// Next valid game object id.
 	nextId int
@@ -50,20 +51,33 @@ const (
 )
 
 // TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
-var game = Game{
-	clients:     make(map[*Client]bool),
-	register:    make(chan *Client),
-	unregister:  make(chan *Client),
-	events:      make(chan interface{}),
-	ships:       make(map[string]*Ship),
-	projectiles: make(map[string]*Projectile),
+var game = CreateGame()
 
-	// Game constants, values per second
-	constants: &GameConstants{
-		ShipAcceleration: 100, // Pixels per second
-		ShipRotation:     100, // Degrees per second
-		ProjectileSpeed:  150, // Pixels per second
-	},
+func CreateGame() *Game {
+	g := &Game{
+		clients:     make(map[*Client]bool),
+		register:    make(chan *Client),
+		unregister:  make(chan *Client),
+		events:      make(chan interface{}),
+		ships:       make(map[string]*Ship),
+		projectiles: make(map[string]*Projectile),
+		asteroids:   make(map[string]*Asteroid),
+
+		// Game constants, values per second
+		constants: &GameConstants{
+			ShipAcceleration: 100, // Pixels per second
+			ShipRotation:     100, // Degrees per second
+			ProjectileSpeed:  150, // Pixels per second
+		},
+	}
+
+	// Generate asteroids
+	for i := 0; i < 100; i++ {
+		id := g.generateId()
+		g.asteroids[id] = CreateAsteroid(id)
+	}
+
+	return g
 }
 
 func (g *Game) run() {
@@ -79,9 +93,8 @@ func (g *Game) run() {
 			g.clients[c] = true
 
 			// Create ship
-			g.nextId++
-			id := strconv.Itoa(g.nextId)
-			pos := &Position{X: 256, Y: 110}
+			id := g.generateId()
+			pos := &Position{X: 0, Y: 0}
 			s := &Ship{Id: id, Angle: 0, Position: pos}
 			g.ships[id] = s
 
@@ -113,6 +126,9 @@ func (g *Game) run() {
 				o.Tick(elapsed)
 			}
 			for _, o := range g.projectiles {
+				o.Tick(elapsed)
+			}
+			for _, o := range g.asteroids {
 				o.Tick(elapsed)
 			}
 			g.broadcastUpdate()
@@ -170,7 +186,7 @@ func (g *Game) cleanup() error {
 }
 
 func (g *Game) fullState() *UpdateData {
-	return &UpdateData{g.ships, g.projectiles}
+	return &UpdateData{g.ships, g.projectiles, g.asteroids}
 }
 
 func (g *Game) broadcastUpdate() {
@@ -188,4 +204,9 @@ func (g *Game) broadcastUpdate() {
 	for c := range g.clients {
 		c.Send(m)
 	}
+}
+
+func (g *Game) generateId() string {
+	g.nextId++
+	return strconv.Itoa(g.nextId)
 }

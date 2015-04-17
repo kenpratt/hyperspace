@@ -21,6 +21,7 @@ type InitData struct {
 type UpdateData struct {
 	Ships       map[string]*Ship       `json:"ships"`
 	Projectiles map[string]*Projectile `json:"projectiles"`
+	Asteroids   map[string]*Asteroid   `json:"asteroids"`
 }
 
 type FireData struct {
