@@ -4,7 +4,8 @@
 * TODO Ship colors - generate different colors for ships server side, sync in data
 * TODO Asteroids flying around (spawn with size and velocity -- for bonus points, make them spin)
 * TODO Ship drift/velocity
-* TODO Move stars server side, more variety/constellations
+* TODO Move stars server side
+* TODO More star variety/constellations
 * TODO Update diffs
 * TODO Collision detection
 * TODO Missiles hitting things
@@ -20,3 +21,4 @@
 * TODO Score
 * TODO Death animation
 * TODO Spawn animation
+* TODO Minimap/radar and/or arrows indication direction to off-screen enemies
