@@ -1,0 +1,22 @@
+* TODO Remove Coquette
+* TODO Accurate client/server time and latency measurements (try to piggyback on WebSocket pings?)
+* TODO Calculate actual elapsed time when doing physics, instead of fixed interval
+* TODO Ship colors - generate different colors for ships server side, sync in data
+* TODO Asteroids flying around (spawn with size and velocity -- for bonus points, make them spin)
+* TODO Ship drift/velocity
+* TODO Move stars server side, more variety/constellations
+* TODO Update diffs
+* TODO Collision detection
+* TODO Missiles hitting things
+* TODO Health
+* TODO Asteroids splitting (predetermined chunk sizes and ids?)
+* TODO Client disconnect -> death/disappear
+* TODO Better ids for projectiles
+* TODO Large game map, viewports with smart data sync
+* TODO Prediction, interpolation, lag compensation, etc
+* TODO Profiling/benchmarking
+* TODO Health bars
+* TODO Death detection
+* TODO Score
+* TODO Death animation
+* TODO Spawn animation
