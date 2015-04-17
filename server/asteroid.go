@@ -15,15 +15,16 @@ func (a *Asteroid) Tick(t uint64) {
 }
 
 func CreateAsteroid(id string) *Asteroid {
-	sides := 6
+	sides := Random(6, 9)
 	shape := make([]*Coordinate, sides)
 	shape[0] = &Coordinate{0, 0}
 	last := shape[0]
-	totalAngle := Angle(0)
+	totalAngle := 0
 	for i := 1; i < sides; i++ {
-		totalAngle += Angle(Random(50, 70))
-		l := Random(10, 20)
-		v := AngleToVector(totalAngle)
+		a := (360 - totalAngle) / (sides - i + 1)
+		totalAngle += Random(a-5, a+5)
+		l := Random(8, 15)
+		v := AngleToVector(Angle(totalAngle))
 		c := &Coordinate{last.X + int64(v.X*float64(l)), last.Y + int64(v.Y*float64(l))}
 		shape[i] = c
 		last = c
