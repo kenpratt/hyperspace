@@ -290,11 +290,11 @@ Hyperspace.prototype.addAsteroid = function(data) {
 // This defines the basic ship shape as a series of verices for a path to
 // follow.
 var ship_shape = [
-  [ 0, -5],
-  [-5,  5],
-  [ 0,  2],
-  [ 5,  5],
-  [ 0, -5]
+  { x:  0, y: -5},
+  { x: -5, y:  5},
+  { x:  0, y:  2},
+  { x:  5, y:  5},
+  { x:  0, y: -5},
 ]
 
 // The actual ship entity. One of these will be created for every single player
@@ -321,9 +321,9 @@ var Ship = function(game, settings) {
     // Draw the actual ship body.
     ctx.beginPath();
     for (i in ship_shape) {
-      var vertex = ship_shape[i];
-      var x = (vertex[0] * this.scale) + this.center.x;
-      var y = (vertex[1] * this.scale) + this.center.y;
+      var v = ship_shape[i];
+      var x = (v.x * this.scale) + this.center.x;
+      var y = (v.y * this.scale) + this.center.y;
       ctx.lineTo(x, y);
     }
     ctx.stroke();
@@ -381,7 +381,7 @@ var Asteroid = function(game, settings) {
   }
 
   this.boundingBox = this.c.collider.CIRCLE;
-  this.size = { x: this.width, y: this.width };
+  this.size = { x: 10, y: 10 };
   this.vector = utils.angleToVector(this.angle);
   this.zindex = -1;
   this.center = this.position;
@@ -393,15 +393,14 @@ var Asteroid = function(game, settings) {
   };
 
   this.draw = function(ctx) {
-    ctx.fillStyle = "#f00";
+    ctx.fillStyle = "rgb(119, 58, 28)";
     ctx.beginPath();
-    ctx.arc(
-        this.center.x, // x
-        this.center.y, // y
-        this.size.x, // Radius
-        0, // Start Angle
-        Math.PI*2, // End Angle
-        true); // Anticlockwise?
+    for (i in this.shape) {
+      var v = this.shape[i];
+      var x = v.x + this.center.x;
+      var y = v.y + this.center.y;
+      ctx.lineTo(x, y);
+    }
     ctx.fill();
   };
 };
