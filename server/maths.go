@@ -18,11 +18,15 @@ type Vector struct {
 
 type Angle uint16
 
-// Converts an angle in degrees between 0 and 360.
+// Converts an angle in degrees between 0 and 359.
 func AngleToVector(angle Angle) *Vector {
 	// Convert to radians.
 	r := float64(angle) * 0.01745
 	return UnitVector(&Vector{X: math.Sin(r), Y: -math.Cos(r)})
+}
+
+func AngleAndSpeedToVector(angle Angle, speed uint16) *Vector {
+	return MultiplyVector(AngleToVector(angle), int(speed))
 }
 
 func Magnitude(vector *Vector) float64 {
@@ -36,6 +40,13 @@ func UnitVector(vector *Vector) *Vector {
 	}
 }
 
+func MultiplyVector(vector *Vector, a int) *Vector {
+	return &Vector{
+		X: (vector.X * float64(a)),
+		Y: (vector.Y * float64(a)),
+	}
+}
+
 func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }
@@ -45,10 +56,9 @@ func AmountToRotate(direction int8, speed uint16, elapsed uint64) Angle {
 	return Angle(float64(direction) * d)
 }
 
-func AmountToMove(angle Angle, speed uint16, elapsed uint64) (int64, int64) {
-	v := AngleToVector(angle)
-	d := float64(speed) * float64(elapsed) / 1000
-	return int64(v.X * d), int64(v.Y * d)
+func AmountToMove(velocity *Vector, elapsed uint64) (int64, int64) {
+	d := float64(elapsed) / 1000
+	return int64(velocity.X * d), int64(velocity.Y * d)
 }
 
 func Random(min int, max int) int {

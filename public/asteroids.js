@@ -266,12 +266,7 @@ Hyperspace.prototype.addEnemyShip = function(data) {
 };
 
 Hyperspace.prototype.addProjectile = function(data) {
-  var projectile = this.c.entities.create(Laser, {
-    id: data.id,
-    center: data.position,
-    vector: utils.angleToVector(data.angle),
-    owner: data.ship_id
-  });
+  var projectile = this.c.entities.create(Laser, data);
 
   if (data.sendEvent) {
     // Send an event (a cause of a thing) that describes what just happened.
@@ -344,6 +339,14 @@ var Laser = function(game, settings) {
     this[i] = settings[i];
   }
 
+  this.center = this.position;
+
+  var vector = utils.angleToVector(this.angle);
+  this.velocity = {
+    x: vector.x * this.game.constants.projectile_speed,
+    y: vector.y * this.game.constants.projectile_speed,
+  };
+
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
 
@@ -351,8 +354,8 @@ var Laser = function(game, settings) {
     var age = 0; // Date.now() - this.created;
     // Kill lazers older than three seconds.
     if (age < 3000) {
-      this.center.x += this.vector.x * this.game.constants.projectile_speed * elapsed;
-      this.center.y += this.vector.y * this.game.constants.projectile_speed * elapsed;
+      this.center.x += this.velocity.x * elapsed;
+      this.center.y += this.velocity.y * elapsed;
     } else {
       this.c.entities.destroy(this);
     }
@@ -382,14 +385,13 @@ var Asteroid = function(game, settings) {
 
   this.boundingBox = this.c.collider.CIRCLE;
   this.size = { x: 10, y: 10 };
-  this.vector = utils.angleToVector(this.angle);
   this.zindex = -1;
   this.center = this.position;
 
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
-    this.center.x += this.vector.x * this.velocity * elapsed;
-    this.center.y += this.vector.y * this.velocity * elapsed;
+    this.center.x += this.velocity.x * elapsed;
+    this.center.y += this.velocity.y * elapsed;
   };
 
   this.draw = function(ctx) {

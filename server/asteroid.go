@@ -4,12 +4,12 @@ type Asteroid struct {
 	Id       string        `json:"id"`
 	Position *Coordinate   `json:"position"`
 	Angle    Angle         `json:"angle"`
-	Velocity uint16        `json:"velocity"`
+	Velocity *Vector       `json:"velocity"`
 	Shape    []*Coordinate `json:"shape"`
 }
 
 func (a *Asteroid) Tick(t uint64) {
-	x, y := AmountToMove(a.Angle, a.Velocity, t)
+	x, y := AmountToMove(a.Velocity, t)
 	a.Position.X += x
 	a.Position.Y += y
 }
@@ -34,7 +34,7 @@ func CreateAsteroid(id string) *Asteroid {
 		Id:       id,
 		Angle:    RandomAngle(),
 		Position: &Coordinate{int64(Random(-1000, 1000)), int64(Random(-1000, 1000))},
-		Velocity: uint16(Random(10, 50)),
+		Velocity: AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50))),
 		Shape:    shape,
 	}
 }

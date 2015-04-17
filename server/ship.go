@@ -14,7 +14,9 @@ func (s *Ship) Tick(t uint64) {
 	}
 
 	if s.Acceleration == 1 {
-		x, y := AmountToMove(s.Angle, game.constants.ShipAcceleration, t)
+		// TODO: When we add drift, move velocity to ship struct, and change it due to acceleration
+		velocity := AngleAndSpeedToVector(s.Angle, game.constants.ShipAcceleration)
+		x, y := AmountToMove(velocity, t)
 		s.Position.X += x
 		s.Position.Y += y
 	}

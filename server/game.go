@@ -161,7 +161,13 @@ func (g *Game) applyEvent(o interface{}) error {
 		}
 
 		pos := *s.Position // Clone ship position
-		projectile := Projectile{Id: e.ProjectileId, Angle: s.Angle, Position: &pos, Created: e.Created}
+		projectile := Projectile{
+			Id:       e.ProjectileId,
+			Velocity: AngleAndSpeedToVector(s.Angle, game.constants.ProjectileSpeed),
+			Position: &pos,
+			Created:  e.Created,
+			Owner:    e.PlayerId,
+		}
 		g.projectiles[projectile.Id] = &projectile
 		return nil
 	default:
