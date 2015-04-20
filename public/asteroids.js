@@ -43,6 +43,15 @@ var utils = {
       y: vector.y / utils.magnitude(vector)
     };
   },
+  angleAndSpeedToVector: function(angle, speed) {
+    return utils.multiplyVector(utils.angleToVector(angle), speed);
+  },
+  multiplyVector: function(vector, a) {
+    return {
+      x: vector.x * a,
+      y: vector.y * a,
+    };
+  },
   simpleMovingAverage: function(period) {
     var nums = new Array(period);
     for (var i = 0; i < period; i++) {
@@ -139,13 +148,13 @@ Hyperspace.prototype.handleUpdate = function(state) {
       this.projectiles[data.id].center = data.position;
       this.projectiles[data.id].angle = data.angle;
     } else {
-      // console.log("Adding projectile");
+      // console.log("Adding projectile", data);
       this.addProjectile(data);
     }
   }
 
-  // This actually does work. Deletes all lasers once the server deletes them.
-  var ents = this.c.entities.all(Laser);
+  // This actually does work. Deletes all projectiles once the server deletes them.
+  var ents = this.c.entities.all(Projectile);
   for (var i in ents) {
     ent = ents[i];
     if (ent != undefined && state.projectiles[ent.id] == undefined) {
@@ -269,6 +278,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
         this.game.addProjectile({
           id: projectileId,
           position: { x:this.center.x, y:this.center.y },
+          velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
           angle: this.angle,
           owner: this.id,
           sendEvent: true,
@@ -289,7 +299,7 @@ Hyperspace.prototype.addEnemyShip = function(data) {
 };
 
 Hyperspace.prototype.addProjectile = function(data) {
-  var projectile = this.c.entities.create(Laser, data);
+  var projectile = this.c.entities.create(Projectile, data);
 
   if (data.sendEvent) {
     // Send an event (a cause of a thing) that describes what just happened.
@@ -349,7 +359,7 @@ var Ship = function(game, settings) {
   };
 };
 
-var Laser = function(game, settings) {
+var Projectile = function(game, settings) {
   this.game = game;
   this.c = game.c;
   this.conn = game.conn;
@@ -364,14 +374,10 @@ var Laser = function(game, settings) {
 
   this.center = this.position;
 
-  var vector = utils.angleToVector(this.angle);
-  this.velocity = {
-    x: vector.x * this.game.constants.projectile_speed,
-    y: vector.y * this.game.constants.projectile_speed,
-  };
-
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
+    this.center.x += this.velocity.x * elapsed;
+    this.center.y += this.velocity.y * elapsed;
     // All asteroid deletion is done in handleUpdate function.
   };
 
