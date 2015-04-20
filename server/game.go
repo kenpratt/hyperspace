@@ -31,6 +31,9 @@ type Game struct {
 
 	// Next valid game object id.
 	nextId int
+
+	// Whether or not to print debug messages.
+	debug bool
 }
 
 type GameConstants struct {
@@ -63,6 +66,7 @@ func CreateGame() *Game {
 		ships:       make(map[string]*Ship),
 		projectiles: make(map[string]*Projectile),
 		asteroids:   make(map[string]*Asteroid),
+		debug:       false,
 
 		// Game constants, values per second
 		constants: &GameConstants{
@@ -81,7 +85,8 @@ func CreateGame() *Game {
 	return g
 }
 
-func (g *Game) run() {
+func (g *Game) run(debug bool) {
+	g.debug = debug
 	ticker := time.NewTicker(updatePeriod)
 	defer func() {
 		ticker.Stop()
@@ -203,7 +208,9 @@ func (g *Game) broadcastUpdate() {
 	raw := json.RawMessage(b)
 	m := &Message{"update", MakeTimestamp(), &raw}
 
-	log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
+	if g.debug {
+		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
+	}
 
 	for c := range g.clients {
 		c.Send(m)
