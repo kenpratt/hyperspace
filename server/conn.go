@@ -58,6 +58,9 @@ func (c *Connection) readPump() {
 		if err != nil {
 			break
 		}
+		if simulateLatency != nil {
+			time.Sleep(*simulateLatency)
+		}
 		if message.Type == "h" {
 			response := &Message{"h", MakeTimestamp(), nil}
 			c.writeJSON(response)
@@ -76,6 +79,9 @@ func (c *Connection) write(mt int, payload []byte) error {
 // write a JSON message.
 func (c *Connection) writeJSON(message *Message) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
+	if simulateLatency != nil {
+		time.Sleep(*simulateLatency)
+	}
 	return c.ws.WriteJSON(message)
 }
 
