@@ -120,7 +120,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
     }
   }
 
-  // TODO: This doesn't quite work yet.
+  // This actually does work. Deletes all lasers once the server deletes them.
   var ents = this.c.entities.all(Laser);
   for (var i in ents) {
     ent = ents[i];
@@ -128,7 +128,6 @@ Hyperspace.prototype.handleUpdate = function(state) {
       this.c.entities.destroy(ent);
     }
   }
-
 
   // add/update asteroids
   for (id in state.asteroids) {
@@ -349,16 +348,7 @@ var Laser = function(game, settings) {
 
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
-
-    // TODO move age logic to server
-    var age = 0; // Date.now() - this.created;
-    // Kill lazers older than three seconds.
-    if (age < 3000) {
-      this.center.x += this.velocity.x * elapsed;
-      this.center.y += this.velocity.y * elapsed;
-    } else {
-      this.c.entities.destroy(this);
-    }
+    // All asteroid deletion is done in handleUpdate function.
   };
 
   this.draw = function(ctx) {
