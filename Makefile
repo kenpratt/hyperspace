@@ -1,10 +1,20 @@
-all: local
+PID = tmp/server.pid
+GO_FILES = $(wildcard server/*.go)
 
-.PHONY: local
-local:
-	cd server/ ; go build
-	./server/server -debug
+local: clean
+	make restart
+	fswatch -o . | xargs -n1 -I{} make restart || make kill
 
-.PHONY: clean
+kill:
+	kill `cat $(PID)` || true
+
+restart:
+	make kill
+	cd server ; go build
+	./server/server -debug -port 9393 & echo $$! > $(PID)
+
 clean:
 	rm -f server/server
+	echo '' > tmp/server.pid
+
+.PHONY: serve restart kill clean

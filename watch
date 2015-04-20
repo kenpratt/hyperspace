@@ -1,33 +1,3 @@
 #!/bin/bash
 
-trap ctrl_c INT
-
-running=true
-pid1=
-pid2=
-
-function ctrl_c() {
-    running=false
-    kill $pid2
-}
-
-while [ "$running" = true ]; do
-      echo "Starting server"
-      make &
-      pid1=$!
-
-      fswatch -1 -r server &
-      pid2=$!
-
-      wait $pid2
-
-      if [ "$running" = true ]; then
-          echo "File changed, restarting server $$"
-          kill -TERM $(ps -o "pid pgid" | grep $$ | awk '{print $1}' | grep -v $$)
-      else
-          echo "Quitting"
-      fi
-
-      wait $pid1
-      echo ""
-done
+make local
