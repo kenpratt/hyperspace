@@ -881,4 +881,3 @@
 
   exports.Entities = Entities;
 })(typeof exports === 'undefined' ? this.Coquette : exports);
-

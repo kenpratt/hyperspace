@@ -30,6 +30,9 @@ type Game struct {
 
 	// Next valid game object id.
 	nextId int
+
+	// Last physics update time
+	lastUpdate uint64
 }
 
 type GameConstants struct {
@@ -69,6 +72,9 @@ func CreateGame() *Game {
 			ShipRotation:     100, // Degrees per second
 			ProjectileSpeed:  150, // Pixels per second
 		},
+
+		// beginning of game time
+		lastUpdate: MakeTimestamp(),
 	}
 
 	// Generate asteroids
@@ -120,8 +126,12 @@ func (g *Game) run() {
 				continue
 			}
 
-			// TODO: Calculate actual elapsed time.
-			var elapsed uint64 = 100 // (milliseconds)
+			// calculate time since last update (in milliseconds)
+			now := MakeTimestamp()
+			elapsed := now - g.lastUpdate
+			g.lastUpdate = now
+
+			// update physics
 			for _, o := range g.ships {
 				o.Tick(elapsed)
 			}
@@ -131,7 +141,7 @@ func (g *Game) run() {
 			for _, o := range g.asteroids {
 				o.Tick(elapsed)
 			}
-			g.broadcastUpdate()
+			g.broadcastUpdate(now)
 		}
 	}
 }
@@ -195,7 +205,7 @@ func (g *Game) fullState() *UpdateData {
 	return &UpdateData{g.ships, g.projectiles, g.asteroids}
 }
 
-func (g *Game) broadcastUpdate() {
+func (g *Game) broadcastUpdate(t uint64) {
 	data := g.fullState()
 	b, err := json.Marshal(data)
 	if err != nil {
@@ -203,7 +213,7 @@ func (g *Game) broadcastUpdate() {
 	}
 
 	raw := json.RawMessage(b)
-	m := &Message{"update", MakeTimestamp(), &raw}
+	m := &Message{"update", t, &raw}
 
 	// log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
 
