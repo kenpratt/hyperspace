@@ -43,6 +43,30 @@ var utils = {
       y: vector.y / utils.magnitude(vector)
     };
   },
+  simpleMovingAverage: function(period) {
+    var nums = new Array(period);
+    for (var i = 0; i < period; i++) {
+      nums[i] = 0;
+    }
+    var length = 0;
+    var idx = 0;
+    var sum = 0;
+    return function(num) {
+      sum -= nums[idx]; // subtract last value
+      nums[idx] = num; // record new value
+      sum += num; // add new value
+      length++; // update length
+
+      // advance pointer
+      idx++;
+      if (idx >= period) {
+        idx = 0;
+      }
+
+      // return result
+      return sum / (length < period ? length : period);
+    }
+  },
 }
 
 // The main game initializer. This function sets up the game.
@@ -400,7 +424,11 @@ var Asteroid = function(game, settings) {
 var ServerConnection = function(url) {
   this.url = url;
   this.socket = null;
-  this.handlers = {};
+  this.handlers = { h: this.onHeartbeat.bind(this) };
+  this.nextHeartbeat = null;
+  this.heartbeatSentAt = null;
+  this.latencySMA = utils.simpleMovingAverage(10);
+  this.latency = 0;
 };
 
 ServerConnection.prototype.connect = function() {
@@ -412,21 +440,26 @@ ServerConnection.prototype.connect = function() {
 
 ServerConnection.prototype.onConnect = function() {
   console.log("websocket connected");
+
+  // schedule next heartbeat
+  this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), 100);
 };
 
 ServerConnection.prototype.onDisconnect = function() {
   console.log("websocket disconnected");
+  clearTimeout(this.nextHeartbeat);
 };
 
 ServerConnection.prototype.onMessage = function(ev) {
   var raw = JSON.parse(ev.data);
   var type = raw.type;
   var data = raw.data;
-  // console.log("websocket received message", type, data);
+  var time = raw.time;
+  // console.log("websocket received message", type, data, time);
 
   var fn = this.handlers[type];
   if (fn) {
-    fn(data);
+    fn(data, time);
   }
 };
 
@@ -442,6 +475,24 @@ ServerConnection.prototype.send = function(type, data) {
 
 ServerConnection.prototype.handle = function(type, fn) {
   this.handlers[type] = fn;
+};
+
+ServerConnection.prototype.sendHeartbeat = function() {
+  this.heartbeatSentAt = new Date();
+  this.send("h", null);
+};
+
+ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
+  var now = (new Date()).getTime();
+  var elapsed = now - this.heartbeatSentAt;
+
+  // update latency & estimated client/server clock difference
+  this.latency = Math.round(this.latencySMA(elapsed));
+  this.clockDiff = now - Math.round(elapsed/2) - serverTime;
+  console.log("got heartbeat", now, serverTime, elapsed, this.latency, this.clockDiff);
+
+  // schedule next heartbeat
+  this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), 100);
 };
 
 window.addEventListener('load', function() {

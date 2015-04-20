@@ -58,6 +58,11 @@ func (c *Connection) readPump() {
 		if err != nil {
 			break
 		}
+		if message.Type == "h" {
+			response := &Message{"h", MakeTimestamp(), nil}
+			c.writeJSON(response)
+			continue
+		}
 		c.receive <- &message
 	}
 }
