@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -104,9 +105,6 @@ func (g *Game) run() {
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
-
-			// TODO: Mark the ship as dead, and then after a time, delete them from the list of ships.
-			// delete(g.ships, c.shipId)
 		case e := <-g.events:
 			err := g.applyEvent(e)
 			if err != nil {
@@ -205,7 +203,7 @@ func (g *Game) broadcastUpdate() {
 	raw := json.RawMessage(b)
 	m := &Message{"update", MakeTimestamp(), &raw}
 
-	// log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
+	log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.ships), len(g.projectiles)))
 
 	for c := range g.clients {
 		c.Send(m)

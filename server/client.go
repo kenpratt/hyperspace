@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 )
 
@@ -31,6 +32,8 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	raw := json.RawMessage(b)
 	c.Send(&Message{"init", MakeTimestamp(), &raw})
 
+	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
+
 	// boot client message handler
 	go c.run()
 }
@@ -45,7 +48,8 @@ func (c *Client) run() {
 		select {
 		case message, ok := <-c.conn.receive:
 			if !ok {
-				log.Println("Client stopping", c.playerId)
+				log.Println(fmt.Sprintf("Client Stopping: %v", c.playerId))
+				delete(game.ships, c.playerId)
 				return
 			}
 			c.handleMessage(message)
