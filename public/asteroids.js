@@ -139,7 +139,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
       this.projectiles[data.id].center = data.position;
       this.projectiles[data.id].angle = data.angle;
     } else {
-      // console.log("Adding projectile");
+      // console.log("Adding projectile", data);
       this.addProjectile(data);
     }
   }
@@ -372,6 +372,8 @@ var Projectile = function(game, settings) {
 
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
+    this.center.x += this.velocity.x * elapsed;
+    this.center.y += this.velocity.y * elapsed;
     // All asteroid deletion is done in handleUpdate function.
   };
 
