@@ -8,6 +8,10 @@ type Projectile struct {
 	Owner    string      `json:"owner"`
 }
 
+const (
+	ProjectileRadius = 10
+)
+
 func (p *Projectile) Tick(t uint64) {
 	x, y := AmountToMove(p.Velocity, t)
 	p.Position.X += x
