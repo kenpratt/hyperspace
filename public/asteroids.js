@@ -43,6 +43,15 @@ var utils = {
       y: vector.y / utils.magnitude(vector)
     };
   },
+  angleAndSpeedToVector: function(angle, speed) {
+    return utils.multiplyVector(utils.angleToVector(angle), speed);
+  },
+  multiplyVector: function(vector, a) {
+    return {
+      x: vector.x * a,
+      y: vector.y * a,
+    };
+  },
   simpleMovingAverage: function(period) {
     var nums = new Array(period);
     for (var i = 0; i < period; i++) {
@@ -269,6 +278,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
         this.game.addProjectile({
           id: projectileId,
           position: { x:this.center.x, y:this.center.y },
+          velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
           angle: this.angle,
           owner: this.id,
           sendEvent: true,
@@ -363,12 +373,6 @@ var Projectile = function(game, settings) {
   }
 
   this.center = this.position;
-
-  var vector = utils.angleToVector(this.angle);
-  this.velocity = {
-    x: vector.x * this.game.constants.projectile_speed,
-    y: vector.y * this.game.constants.projectile_speed,
-  };
 
   this.update = function(elapsedMillis) {
     var elapsed = elapsedMillis / 1000;
