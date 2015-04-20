@@ -2,7 +2,8 @@ all: local
 
 .PHONY: local
 local:
-	go run server/*.go
+	cd server/ ; go build
+	./server/server -debug
 
 .PHONY: clean
 clean:
