@@ -6,7 +6,7 @@ local: clean
 	fswatch -o . | xargs -n1 -I{} make restart || make kill
 
 kill:
-	kill `cat $(PID)` || true
+	[ -f $(PID) ] && kill -9 `cat $(PID)` || true
 
 restart:
 	make kill
@@ -15,6 +15,6 @@ restart:
 
 clean:
 	rm -f server/server
-	echo '' > tmp/server.pid
+	rm -f $PID
 
 .PHONY: serve restart kill clean
