@@ -487,9 +487,8 @@ ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
   var elapsed = now - this.heartbeatSentAt;
 
   // update latency & estimated client/server clock difference
-  this.latency = Math.round(this.latencySMA(elapsed));
   this.clockDiff = now - Math.round(elapsed/2) - serverTime;
-  console.log("got heartbeat", now, serverTime, elapsed, this.latency, this.clockDiff);
+  this.latency = Math.round(this.latencySMA(elapsed));
 
   // schedule next heartbeat
   this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), 100);
