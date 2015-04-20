@@ -15,5 +15,5 @@ func (p *Projectile) Tick(t uint64) {
 }
 
 func (p *Projectile) Alive() bool {
-	return (MakeTimestamp() - p.Created) < 3000
+	return (MakeTimestamp() - p.Created) < 2000
 }
