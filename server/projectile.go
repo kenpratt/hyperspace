@@ -12,10 +12,30 @@ const (
 	ProjectileRadius = 10
 )
 
-func (p *Projectile) Tick(t uint64) {
+func CreateProjectile(id string, pos *Point, angle float64, created uint64, owner string) *Projectile {
+
+	return &Projectile{
+		Id:       id,
+		Position: pos,
+		Velocity: AngleAndSpeedToVector(angle, game.constants.ProjectileSpeed),
+		Created:  created,
+		Owner:    owner,
+	}
+}
+
+func (p *Projectile) Tick(t uint64) *Projectile {
+	// calculate new position
 	x, y := AmountToMove(p.Velocity, t)
-	p.Position.X += x
-	p.Position.Y += y
+	pos := &Point{p.Position.X + x, p.Position.Y + y}
+
+	// return copy of object with new position
+	return &Projectile{
+		Id:       p.Id,
+		Position: pos,
+		Velocity: p.Velocity,
+		Created:  p.Created,
+		Owner:    p.Owner,
+	}
 }
 
 func (p *Projectile) Alive() bool {

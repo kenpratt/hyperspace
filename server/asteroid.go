@@ -8,12 +8,6 @@ type Asteroid struct {
 	Shape    []*Point `json:"shape"`
 }
 
-func (a *Asteroid) Tick(t uint64) {
-	x, y := AmountToMove(a.Velocity, t)
-	a.Position.X += x
-	a.Position.Y += y
-}
-
 func CreateAsteroid(id string) *Asteroid {
 	sides := Random(6, 9)
 	shape := make([]*Point, sides)
@@ -32,9 +26,24 @@ func CreateAsteroid(id string) *Asteroid {
 
 	return &Asteroid{
 		Id:       id,
-		Angle:    RandomAngle(),
 		Position: &Point{float64(Random(-1000, 1000)), float64(Random(-1000, 1000))},
+		Angle:    RandomAngle(),
 		Velocity: AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50))),
 		Shape:    shape,
+	}
+}
+
+func (a *Asteroid) Tick(t uint64) *Asteroid {
+	// calculate new position
+	x, y := AmountToMove(a.Velocity, t)
+	pos := &Point{a.Position.X + x, a.Position.Y + y}
+
+	// return copy of object with new position
+	return &Asteroid{
+		Id:       a.Id,
+		Position: pos,
+		Angle:    a.Angle,
+		Velocity: a.Velocity,
+		Shape:    a.Shape,
 	}
 }

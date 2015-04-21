@@ -110,8 +110,7 @@ func (g *Game) run(debug bool) {
 			// Create ship
 			id := g.generateId()
 			pos := &Point{X: 0, Y: 0}
-			s := &Ship{Id: id, Angle: 0, Position: pos}
-			g.ships[id] = s
+			g.ships[id] = CreateShip(id, pos)
 
 			// Send game state dump to player
 			c.Initialize(id, g.constants, g.fullState())
@@ -138,15 +137,32 @@ func (g *Game) run(debug bool) {
 			elapsed := uint64(gameUpdatePeriod / time.Millisecond)
 
 			// update physics
+			newShips := make(map[string]*Ship)
 			for _, o := range g.ships {
-				o.Tick(elapsed)
+				p := o.Tick(elapsed)
+				if p != nil {
+					newShips[p.Id] = p
+				}
 			}
+			game.ships = newShips
+
+			newProjectiles := make(map[string]*Projectile)
 			for _, o := range g.projectiles {
-				o.Tick(elapsed)
+				p := o.Tick(elapsed)
+				if p != nil {
+					newProjectiles[p.Id] = p
+				}
 			}
+			game.projectiles = newProjectiles
+
+			newAsteroids := make(map[string]*Asteroid)
 			for _, o := range g.asteroids {
-				o.Tick(elapsed)
+				p := o.Tick(elapsed)
+				if p != nil {
+					newAsteroids[p.Id] = p
+				}
 			}
+			game.asteroids = newAsteroids
 		case <-clientUpdateTicker.C:
 			g.broadcastUpdate(g.lastUpdate)
 		}
@@ -178,14 +194,8 @@ func (g *Game) applyEvent(o interface{}) error {
 		}
 
 		pos := *s.Position // Clone ship position
-		projectile := Projectile{
-			Id:       e.ProjectileId,
-			Velocity: AngleAndSpeedToVector(s.Angle, game.constants.ProjectileSpeed),
-			Position: &pos,
-			Created:  e.Created,
-			Owner:    e.PlayerId,
-		}
-		g.projectiles[projectile.Id] = &projectile
+		projectile := CreateProjectile(e.ProjectileId, &pos, s.Angle, e.Created, e.PlayerId)
+		g.projectiles[projectile.Id] = projectile
 		return nil
 	default:
 		return GameError{"Don't know how to apply event"}
