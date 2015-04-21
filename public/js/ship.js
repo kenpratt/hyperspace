@@ -76,20 +76,29 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
         var projectileId = this.id + "." + Date.now();
-        var projectile = this.game.addProjectile({
-          id: projectileId,
-          alive: true,
-          position: { x:this.center.x, y:this.center.y },
-          velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
-          angle: this.angle,
-          owner: this.id,
-        });
 
-        // Send an event (a cause of a thing) that describes what just happened.
-        this.conn.send("fire", {
-          projectileId: projectile.id,
-          created: projectile.created,
-        });
+        if (this.game.clientUpdatesEnabled) {
+          var projectile = this.game.addProjectile({
+            id: projectileId,
+            alive: true,
+            position: { x:this.center.x, y:this.center.y },
+            velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
+            angle: this.angle,
+            owner: this.id,
+          });
+
+          // Send an event (a cause of a thing) that describes what just happened.
+          this.conn.send("fire", {
+            projectileId: projectile.id,
+            created: projectile.created,
+          });
+        } else {
+          // Send an event (a cause of a thing) that describes what just happened.
+          this.conn.send("fire", {
+            projectileId: projectileId,
+            created: Date.now(),
+          });
+        }
       }
     },
   });
