@@ -1,11 +1,11 @@
 package main
 
 type Projectile struct {
-	Id       string      `json:"id"`
-	Position *Coordinate `json:"position"`
-	Velocity *Vector     `json:"velocity"`
-	Created  uint64      `json:"created"`
-	Owner    string      `json:"owner"`
+	Id       string  `json:"id"`
+	Position *Point  `json:"position"`
+	Velocity *Vector `json:"velocity"`
+	Created  uint64  `json:"created"`
+	Owner    string  `json:"owner"`
 }
 
 const (
