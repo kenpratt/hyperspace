@@ -122,15 +122,8 @@ func (g *Game) run(debug bool) {
 			err := g.applyEvent(e)
 			if err != nil {
 				log.Println("Error applying event", e, err)
-				continue
 			}
 		case <-gameUpdateTicker.C:
-			err := g.cleanup()
-			if err != nil {
-				log.Println("Error Cleaning Up", err)
-				continue
-			}
-
 			// calculate time since last update (in milliseconds)
 			now := MakeTimestamp()
 			g.lastUpdate = now
@@ -165,6 +158,9 @@ func (g *Game) run(debug bool) {
 			game.asteroids = newAsteroids
 		case <-clientUpdateTicker.C:
 			g.broadcastUpdate(g.lastUpdate)
+			if err := g.cleanup(); err != nil {
+				log.Println("Error Cleaning Up", err)
+			}
 		}
 	}
 }
@@ -206,7 +202,7 @@ func (g *Game) cleanup() error {
 	dead := []string{}
 
 	for k, v := range g.projectiles {
-		if !v.Alive() {
+		if !v.Alive {
 			dead = append(dead, k)
 		}
 	}

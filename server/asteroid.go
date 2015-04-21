@@ -2,6 +2,7 @@ package main
 
 type Asteroid struct {
 	Id       string   `json:"id"`
+	Alive    bool     `json:"alive"`
 	Position *Point   `json:"position"`
 	Angle    float64  `json:"angle"`
 	Velocity *Vector  `json:"velocity"`
@@ -26,6 +27,7 @@ func CreateAsteroid(id string) *Asteroid {
 
 	return &Asteroid{
 		Id:       id,
+		Alive:    true,
 		Position: &Point{float64(Random(-1000, 1000)), float64(Random(-1000, 1000))},
 		Angle:    RandomAngle(),
 		Velocity: AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50))),
@@ -41,6 +43,7 @@ func (a *Asteroid) Tick(t uint64) *Asteroid {
 	// return copy of object with new position
 	return &Asteroid{
 		Id:       a.Id,
+		Alive:    a.Alive,
 		Position: pos,
 		Angle:    a.Angle,
 		Velocity: a.Velocity,

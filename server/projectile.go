@@ -2,6 +2,7 @@ package main
 
 type Projectile struct {
 	Id       string  `json:"id"`
+	Alive    bool    `json:"alive"`
 	Position *Point  `json:"position"`
 	Velocity *Vector `json:"velocity"`
 	Created  uint64  `json:"created"`
@@ -16,6 +17,7 @@ func CreateProjectile(id string, pos *Point, angle float64, created uint64, owne
 
 	return &Projectile{
 		Id:       id,
+		Alive:    true,
 		Position: pos,
 		Velocity: AngleAndSpeedToVector(angle, game.constants.ProjectileSpeed),
 		Created:  created,
@@ -28,16 +30,19 @@ func (p *Projectile) Tick(t uint64) *Projectile {
 	x, y := AmountToMove(p.Velocity, t)
 	pos := &Point{p.Position.X + x, p.Position.Y + y}
 
+	// calculate new aliveness
+	alive := p.Alive
+	if alive && (MakeTimestamp()-p.Created) >= 2000 {
+		alive = false
+	}
+
 	// return copy of object with new position
 	return &Projectile{
 		Id:       p.Id,
+		Alive:    alive,
 		Position: pos,
 		Velocity: p.Velocity,
 		Created:  p.Created,
 		Owner:    p.Owner,
 	}
-}
-
-func (p *Projectile) Alive() bool {
-	return (MakeTimestamp() - p.Created) < 2000
 }

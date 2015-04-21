@@ -78,6 +78,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
         var projectileId = this.id + "." + Date.now();
         this.game.addProjectile({
           id: projectileId,
+          alive: true,
           position: { x:this.center.x, y:this.center.y },
           velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
           angle: this.angle,

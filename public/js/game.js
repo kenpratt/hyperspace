@@ -56,10 +56,13 @@ Hyperspace.prototype.handleUpdate = function(state) {
   // add/update ships
   for (id in state.ships) {
     var data = state.ships[id];
-    if (this.ships[id]) {
+    var obj = this.ships[id];
+    if (obj) {
       // console.log("Updating ship", data);
-      this.ships[id].center = data.position;
-      this.ships[id].angle = data.angle;
+      for (f in data) {
+        obj[f] = data[f];
+      }
+      obj.center = obj.position; // update center alias for position
     } else {
       if (data.id === this.playerId) {
         // console.log("Adding own ship");
@@ -74,21 +77,25 @@ Hyperspace.prototype.handleUpdate = function(state) {
   // add/update projectiles
   for (id in state.projectiles) {
     var data = state.projectiles[id];
-    if (this.projectiles[id]) {
+    var obj = this.projectiles[id];
+    if (obj) {
       // console.log("Updating projectile", data);
-      this.projectiles[data.id].center = data.position;
-      this.projectiles[data.id].angle = data.angle;
+      for (f in data) {
+        obj[f] = data[f];
+      }
+      obj.center = obj.position; // update center alias for position
     } else {
       // console.log("Adding projectile", data);
       this.addProjectile(data);
     }
   }
 
-  // This actually does work. Deletes all projectiles once the server deletes them.
+  // This actually does work. Deletes all projectiles once the server sets alive to false.
   var ents = this.c.entities.all(Projectile);
   for (var i in ents) {
-    ent = ents[i];
-    if (ent != undefined && state.projectiles[ent.id] == undefined) {
+    var ent = ents[i];
+    if (ent && !ent.alive) {
+      // console.log("Destroying projectile", ent);
       this.c.entities.destroy(ent);
     }
   }
@@ -96,11 +103,13 @@ Hyperspace.prototype.handleUpdate = function(state) {
   // add/update asteroids
   for (id in state.asteroids) {
     var data = state.asteroids[id];
-    if (this.asteroids[id]) {
+    var obj = this.asteroids[id];
+    if (obj) {
       // console.log("Updating asteroid", data);
-      this.asteroids[data.id].center = data.position;
-      this.asteroids[data.id].angle = data.angle;
-      this.asteroids[data.id].velocity = data.velocity;
+      for (f in data) {
+        obj[f] = data[f];
+      }
+      obj.center = obj.position; // update center alias for position
     } else {
       // console.log("Adding asteroid");
       this.addAsteroid(data);

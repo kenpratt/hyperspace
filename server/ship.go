@@ -8,6 +8,7 @@ import (
 
 type Ship struct {
 	Id           string  `json:"id"`
+	Alive        bool    `json:"alive"`
 	Position     *Point  `json:"position"`
 	Angle        float64 `json:"angle"`
 	Acceleration int8    `json:"acceleration"`
@@ -21,6 +22,7 @@ const (
 func CreateShip(id string, pos *Point) *Ship {
 	return &Ship{
 		Id:           id,
+		Alive:        true,
 		Position:     pos,
 		Angle:        0,
 		Acceleration: 0,
@@ -74,6 +76,7 @@ func (s *Ship) Tick(t uint64) *Ship {
 
 	return &Ship{
 		Id:           s.Id,
+		Alive:        s.Alive,
 		Position:     pos,
 		Angle:        angle,
 		Acceleration: s.Acceleration,
