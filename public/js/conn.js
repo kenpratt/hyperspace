@@ -1,5 +1,6 @@
-var ServerConnection = function(url) {
+var ServerConnection = function(url, params) {
   this.url = url;
+  this.params = params;
   this.socket = null;
   this.handlers = { h: this.onHeartbeat.bind(this) };
   this.nextHeartbeat = null;
@@ -36,7 +37,11 @@ ServerConnection.prototype.onMessage = function(ev) {
 
   var fn = this.handlers[type];
   if (fn) {
-    fn(data, time);
+    if (this.params.latency) {
+      setTimeout(function() { fn(data, time); }, this.params.latency / 2);
+    } else {
+      fn(data, time);
+    }
   }
 };
 
@@ -44,7 +49,11 @@ ServerConnection.prototype.send = function(type, data) {
   var msg = JSON.stringify({ type: type, time: Date.now(), data: data });
   if (this.socket.readyState === this.socket.OPEN) {
     // console.log("websocket sending message", type, data);
-    this.socket.send(msg);
+    if (this.params.latency) {
+      setTimeout(function() { this.socket.send(msg); }.bind(this), this.params.latency / 2);
+    } else {
+      this.socket.send(msg);
+    }
   } else {
     console.warn("websocket not connected, can't send message", type, data);
   }

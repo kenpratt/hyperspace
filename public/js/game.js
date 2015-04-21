@@ -2,11 +2,13 @@
 // Authors: @kenpratt and @icco
 
 // The main game initializer. This function sets up the game.
-var Hyperspace = function() {
+var Hyperspace = function(params) {
+  this.params = params;
+
   this.size = {x: 1000, y: 600};
   this.c = new Coquette(this, "canvas", this.size.x, this.size.y, "#000");
 
-  this.conn = new ServerConnection("ws://" + window.location.host + "/ws");
+  this.conn = new ServerConnection("ws://" + window.location.host + "/ws", { latency: this.params.latency });
   this.conn.connect();
 
   this.playerId = null;
