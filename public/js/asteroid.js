@@ -1,5 +1,7 @@
 Hyperspace.prototype.addAsteroid = function(data) {
-  this.asteroids[data.id] = this.c.entities.create(Asteroid, data);
+  var asteroid = this.c.entities.create(Asteroid, data);
+  this.asteroids[data.id] = asteroid;
+  return asteroid;
 };
 
 var Asteroid = function(game, settings) {

@@ -76,19 +76,25 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
         var projectileId = this.id + "." + Date.now();
-        this.game.addProjectile({
+        var projectile = this.game.addProjectile({
           id: projectileId,
           alive: true,
           position: { x:this.center.x, y:this.center.y },
           velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
           angle: this.angle,
           owner: this.id,
-          sendEvent: true,
+        });
+
+        // Send an event (a cause of a thing) that describes what just happened.
+        this.conn.send("fire", {
+          projectileId: projectile.id,
+          created: projectile.created,
         });
       }
     },
   });
   this.ships[data.id] = ship;
+  return ship;
 };
 
 Hyperspace.prototype.addEnemyShip = function(data) {
@@ -98,6 +104,7 @@ Hyperspace.prototype.addEnemyShip = function(data) {
     color:"#0f7"
   });
   this.ships[data.id] = ship;
+  return ship;
 };
 
 // This defines the basic ship shape as a series of verices for a path to

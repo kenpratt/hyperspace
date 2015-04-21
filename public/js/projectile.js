@@ -1,14 +1,7 @@
 Hyperspace.prototype.addProjectile = function(data) {
   var projectile = this.c.entities.create(Projectile, data);
-
-  if (data.sendEvent) {
-    // Send an event (a cause of a thing) that describes what just happened.
-    this.conn.send("fire", {
-      projectileId: projectile.id,
-      created: projectile.created,
-    });
-  }
   this.projectiles[data.id] = projectile;
+  return projectile;
 };
 
 var Projectile = function(game, settings) {
