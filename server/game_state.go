@@ -1,22 +1,23 @@
 package main
 
 type GameState struct {
-	// Game objects that currently exist
+	Time        uint64                 `json:"time"`
 	Ships       map[string]*Ship       `json:"ships"`
 	Projectiles map[string]*Projectile `json:"projectiles"`
 	Asteroids   map[string]*Asteroid   `json:"asteroids"`
 }
 
-func CreateGameState() *GameState {
+func CreateGameState(time uint64) *GameState {
 	return &GameState{
+		Time:        time,
 		Ships:       make(map[string]*Ship),
 		Projectiles: make(map[string]*Projectile),
 		Asteroids:   make(map[string]*Asteroid),
 	}
 }
 
-func (s *GameState) Tick(elapsed uint64) *GameState {
-	t := CreateGameState()
+func (s *GameState) Tick(time uint64, elapsed uint64) *GameState {
+	t := CreateGameState(time)
 
 	for _, o := range s.Ships {
 		p := o.Tick(elapsed)

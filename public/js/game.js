@@ -39,21 +39,21 @@ var Hyperspace = function(params) {
     */
   };
 
-  this.conn.handle("init", function(data, t) {
+  this.conn.handle("init", function(data) {
     this.playerId = data.playerId;
     this.constants = data.constants;
-    this.handleUpdate(data.state, t);
+    this.handleUpdate(data.state);
   }.bind(this));
 
-  this.conn.handle("update", function(data, t) {
+  this.conn.handle("update", function(data) {
     if (this.serverUpdatesEnabled) {
-      this.handleUpdate(data, t);
+      this.handleUpdate(data);
     }
   }.bind(this));
 };
 
-Hyperspace.prototype.handleUpdate = function(state, t) {
-  var elapsed = this.conn.estimatedServerTime() - t;
+Hyperspace.prototype.handleUpdate = function(state) {
+  var elapsed = this.conn.estimatedServerTime() - state.time;
 
   // add/update ships
   for (id in state.ships) {

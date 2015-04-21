@@ -32,9 +32,6 @@ type Game struct {
 
 	// Whether or not to print debug messages.
 	debug bool
-
-	// Last physics update time
-	lastUpdate uint64
 }
 
 type GameConstants struct {
@@ -65,7 +62,7 @@ func CreateGame() *Game {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		events:     make(chan interface{}),
-		state:      CreateGameState(),
+		state:      CreateGameState(MakeTimestamp()),
 		debug:      false,
 
 		// Game constants, values per second
@@ -74,9 +71,6 @@ func CreateGame() *Game {
 			ShipRotation:     100, // Degrees per second
 			ProjectileSpeed:  150, // Pixels per second
 		},
-
-		// beginning of game time
-		lastUpdate: MakeTimestamp(),
 	}
 
 	// Generate asteroids
@@ -122,13 +116,12 @@ func (g *Game) run(debug bool) {
 		case <-gameUpdateTicker.C:
 			// calculate time since last update (in milliseconds)
 			now := MakeTimestamp()
-			g.lastUpdate = now
 			elapsed := uint64(gameUpdatePeriod / time.Millisecond)
 
 			// update game state
-			g.state = g.state.Tick(elapsed)
+			g.state = g.state.Tick(now, elapsed)
 		case <-clientUpdateTicker.C:
-			g.broadcastUpdate(g.lastUpdate)
+			g.broadcastUpdate()
 			if err := g.cleanup(); err != nil {
 				log.Println("Error Cleaning Up", err)
 			}
@@ -185,14 +178,14 @@ func (g *Game) cleanup() error {
 	return nil
 }
 
-func (g *Game) broadcastUpdate(t uint64) {
+func (g *Game) broadcastUpdate() {
 	b, err := json.Marshal(g.state)
 	if err != nil {
 		panic(err)
 	}
 
 	raw := json.RawMessage(b)
-	m := &Message{"update", t, &raw}
+	m := &Message{"update", MakeTimestamp(), &raw}
 
 	if g.debug {
 		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.state.Ships), len(g.state.Projectiles)))
