@@ -75,7 +75,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
-        var projectileId = this.id + "." + Date.now();
+        var projectileId = this.id + "." + this.conn.now();
 
         if (this.game.clientUpdatesEnabled) {
           var projectile = this.game.addProjectile({
@@ -96,7 +96,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
           // Send an event (a cause of a thing) that describes what just happened.
           this.conn.send("fire", {
             projectileId: projectileId,
-            created: Date.now(),
+            created: this.conn.now(),
           });
         }
       }

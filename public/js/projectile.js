@@ -11,7 +11,7 @@ var Projectile = function(game, settings) {
   this.boundingBox = this.c.collider.CIRCLE;
   this.size = { x: 3, y: 3 };
   this.zindex = -1;
-  this.created = Date.now()
+  this.created = this.conn.now();
 
   for (var i in settings) {
     this[i] = settings[i];

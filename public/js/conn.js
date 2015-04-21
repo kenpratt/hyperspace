@@ -47,7 +47,7 @@ ServerConnection.prototype.onMessage = function(ev) {
 };
 
 ServerConnection.prototype.send = function(type, data) {
-  var msg = JSON.stringify({ type: type, time: Date.now(), data: data });
+  var msg = JSON.stringify({ type: type, time: this.now(), data: data });
   if (this.socket.readyState === this.socket.OPEN) {
     // console.log("websocket sending message", type, data);
     if (this.params.latency) {
@@ -65,7 +65,7 @@ ServerConnection.prototype.handle = function(type, fn) {
 };
 
 ServerConnection.prototype.sendHeartbeat = function() {
-  this.heartbeatSentAt = new Date();
+  this.heartbeatSentAt = Date.now();
   this.send("h", null);
 };
 
@@ -81,6 +81,6 @@ ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
   this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), 100);
 };
 
-ServerConnection.prototype.estimatedServerTime = function() {
+ServerConnection.prototype.now = function() {
   return Date.now() + this.clockDiff;
 };

@@ -53,7 +53,7 @@ var Hyperspace = function(params) {
 };
 
 Hyperspace.prototype.handleUpdate = function(state) {
-  var elapsed = this.conn.estimatedServerTime() - state.time;
+  var elapsed = this.conn.now() - state.time;
 
   // add/update ships
   for (id in state.ships) {
