@@ -135,16 +135,17 @@ func (g *Game) run(debug bool) {
 			// calculate time since last update (in milliseconds)
 			now := MakeTimestamp()
 			g.lastUpdate = now
+			elapsed := uint64(gameTickPeriod / time.Millisecond)
 
 			// update physics
 			for _, o := range g.ships {
-				o.Tick(uint64(gameTickPeriod))
+				o.Tick(elapsed)
 			}
 			for _, o := range g.projectiles {
-				o.Tick(uint64(gameTickPeriod))
+				o.Tick(elapsed)
 			}
 			for _, o := range g.asteroids {
-				o.Tick(uint64(gameTickPeriod))
+				o.Tick(elapsed)
 			}
 		case <-updateTicker.C:
 			g.broadcastUpdate(g.lastUpdate)
