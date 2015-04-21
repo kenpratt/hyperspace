@@ -18,6 +18,18 @@ type Vector struct {
 
 type Angle uint16
 
+func AddFloatToAngle(a Angle, f float64) Angle {
+	f += float64(a)
+	for f < 0 {
+		f += 360
+	}
+	if f >= 360 {
+		return Angle(int64(f) % 360)
+	} else {
+		return Angle(f)
+	}
+}
+
 // Converts an angle in degrees between 0 and 359.
 func AngleToVector(angle Angle) *Vector {
 	// Convert to radians.
@@ -51,9 +63,9 @@ func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }
 
-func AmountToRotate(direction int8, speed uint16, elapsed uint64) Angle {
+func AmountToRotate(direction int8, speed uint16, elapsed uint64) float64 {
 	d := float64(speed) * float64(elapsed) / 1000
-	return Angle(float64(direction) * d)
+	return float64(direction) * d
 }
 
 func AmountToMove(velocity *Vector, elapsed uint64) (int64, int64) {

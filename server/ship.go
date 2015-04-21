@@ -20,7 +20,8 @@ const (
 
 func (s *Ship) Tick(t uint64) {
 	if s.Rotation != 0 {
-		s.Angle += AmountToRotate(s.Rotation, game.constants.ShipRotation, t)
+		d := AmountToRotate(s.Rotation, game.constants.ShipRotation, t)
+		s.Angle = AddFloatToAngle(s.Angle, d)
 	}
 
 	if s.Acceleration == 1 {
