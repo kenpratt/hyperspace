@@ -116,7 +116,7 @@ func (g *Game) run(debug bool) {
 		case <-gameUpdateTicker.C:
 			// calculate time since last update (in milliseconds)
 			now := MakeTimestamp()
-			elapsed := uint64(gameUpdatePeriod / time.Millisecond)
+			elapsed := now - g.state.Time
 
 			// update game state
 			g.state = g.state.Tick(now, elapsed)
