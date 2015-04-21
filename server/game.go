@@ -54,8 +54,8 @@ func (e GameError) Error() string {
 }
 
 const (
+	gameUpdatePeriod   = 10 * time.Millisecond
 	clientUpdatePeriod = 100 * time.Millisecond
-	gameTickPeriod     = 10 * time.Millisecond
 )
 
 // TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
@@ -94,11 +94,11 @@ func CreateGame() *Game {
 
 func (g *Game) run(debug bool) {
 	g.debug = debug
-	updateTicker := time.NewTicker(gameTickPeriod)
-	gameTicker := time.NewTicker(clientUpdatePeriod)
+	gameUpdateTicker := time.NewTicker(gameUpdatePeriod)
+	clientUpdateTicker := time.NewTicker(clientUpdatePeriod)
 	defer func() {
-		updateTicker.Stop()
-		gameTicker.Stop()
+		gameUpdateTicker.Stop()
+		clientUpdateTicker.Stop()
 	}()
 
 	for {
@@ -125,7 +125,7 @@ func (g *Game) run(debug bool) {
 				log.Println("Error applying event", e, err)
 				continue
 			}
-		case <-gameTicker.C:
+		case <-gameUpdateTicker.C:
 			err := g.cleanup()
 			if err != nil {
 				log.Println("Error Cleaning Up", err)
@@ -135,7 +135,7 @@ func (g *Game) run(debug bool) {
 			// calculate time since last update (in milliseconds)
 			now := MakeTimestamp()
 			g.lastUpdate = now
-			elapsed := uint64(gameTickPeriod / time.Millisecond)
+			elapsed := uint64(gameUpdatePeriod / time.Millisecond)
 
 			// update physics
 			for _, o := range g.ships {
@@ -147,7 +147,7 @@ func (g *Game) run(debug bool) {
 			for _, o := range g.asteroids {
 				o.Tick(elapsed)
 			}
-		case <-updateTicker.C:
+		case <-clientUpdateTicker.C:
 			g.broadcastUpdate(g.lastUpdate)
 		}
 	}
