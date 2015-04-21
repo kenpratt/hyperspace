@@ -21,7 +21,7 @@ func makeClient(conn *Connection) *Client {
 	return c
 }
 
-func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameState *UpdateData) {
+func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameState *GameState) {
 	c.playerId = playerId
 
 	// send initial player data to client
@@ -49,7 +49,7 @@ func (c *Client) run() {
 		case message, ok := <-c.conn.receive:
 			if !ok {
 				log.Println(fmt.Sprintf("Client Stopping: %v", c.playerId))
-				delete(game.ships, c.playerId)
+				delete(game.state.Ships, c.playerId)
 				return
 			}
 			c.handleMessage(message)

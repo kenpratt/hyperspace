@@ -48,7 +48,7 @@ func (s *Ship) Tick(t uint64) *Ship {
 
 	// TODO: Come up with a better way to look up collisions.
 	// From https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
-	for _, os := range game.ships {
+	for _, os := range game.state.Ships {
 		if os.Id != s.Id {
 			dx := s.Position.X - os.Position.X
 			dy := s.Position.Y - os.Position.Y
@@ -62,7 +62,7 @@ func (s *Ship) Tick(t uint64) *Ship {
 		}
 	}
 
-	for _, p := range game.projectiles {
+	for _, p := range game.state.Projectiles {
 		dx := s.Position.X - p.Position.X
 		dy := s.Position.Y - p.Position.Y
 		distance := math.Sqrt(float64(dx*dx + dy*dy))

@@ -15,13 +15,7 @@ type Message struct {
 type InitData struct {
 	PlayerId  string         `json:"playerId"`
 	Constants *GameConstants `json:"constants"`
-	State     *UpdateData    `json:"state"`
-}
-
-type UpdateData struct {
-	Ships       map[string]*Ship       `json:"ships"`
-	Projectiles map[string]*Projectile `json:"projectiles"`
-	Asteroids   map[string]*Asteroid   `json:"asteroids"`
+	State     *GameState     `json:"state"`
 }
 
 type FireData struct {
