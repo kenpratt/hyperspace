@@ -27,7 +27,8 @@ var Projectile = function(game, settings) {
   this.center = this.position;
 
   this.update = function(elapsedMillis) {
-    var elapsed = elapsedMillis / 1000;
+    var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
+
     this.center.x += this.velocity.x * elapsed;
     this.center.y += this.velocity.y * elapsed;
     // All asteroid deletion is done in handleUpdate function.

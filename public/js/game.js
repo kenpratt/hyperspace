@@ -5,6 +5,10 @@
 var Hyperspace = function(params) {
   this.params = params;
 
+  // selectively enable/disable which updates are processed
+  this.clientUpdatesEnabled = !params.updates || params.updates == "client" || params.updates == "both";
+  this.serverUpdatesEnabled = !params.updates || params.updates == "server" || params.updates == "both";
+
   this.size = {x: 1000, y: 600};
   this.c = new Coquette(this, "canvas", this.size.x, this.size.y, "#000");
 
@@ -42,7 +46,9 @@ var Hyperspace = function(params) {
   }.bind(this));
 
   this.conn.handle("update", function(data) {
-    this.handleUpdate(data);
+    if (this.serverUpdatesEnabled) {
+      this.handleUpdate(data);
+    }
   }.bind(this));
 };
 

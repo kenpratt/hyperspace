@@ -16,7 +16,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function(elapsedMillis) {
-      var elapsed = elapsedMillis / 1000;
+      var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
 
       // This keeps the players ship always in the center.
       this.c.renderer.setViewCenter(this.center);
