@@ -7,8 +7,8 @@ import (
 )
 
 type Point struct {
-	X int64 `json:"x"`
-	Y int64 `json:"y"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 type Vector struct {
@@ -16,28 +16,14 @@ type Vector struct {
 	Y float64 `json:"y"`
 }
 
-type Angle uint16
-
-func AddFloatToAngle(a Angle, f float64) Angle {
-	f += float64(a)
-	for f < 0 {
-		f += 360
-	}
-	if f >= 360 {
-		return Angle(int64(f) % 360)
-	} else {
-		return Angle(f)
-	}
-}
-
 // Converts an angle in degrees between 0 and 359.
-func AngleToVector(angle Angle) *Vector {
+func AngleToVector(angle float64) *Vector {
 	// Convert to radians.
 	r := float64(angle) * 0.01745
 	return UnitVector(&Vector{X: math.Sin(r), Y: -math.Cos(r)})
 }
 
-func AngleAndSpeedToVector(angle Angle, speed uint16) *Vector {
+func AngleAndSpeedToVector(angle float64, speed uint16) *Vector {
 	return MultiplyVector(AngleToVector(angle), int(speed))
 }
 
@@ -68,9 +54,9 @@ func AmountToRotate(direction int8, speed uint16, elapsed uint64) float64 {
 	return float64(direction) * d
 }
 
-func AmountToMove(velocity *Vector, elapsed uint64) (int64, int64) {
+func AmountToMove(velocity *Vector, elapsed uint64) (float64, float64) {
 	d := float64(elapsed) / 1000
-	return int64(velocity.X * d), int64(velocity.Y * d)
+	return velocity.X * d, velocity.Y * d
 }
 
 func Random(min int, max int) int {
@@ -78,6 +64,6 @@ func Random(min int, max int) int {
 	return min + rand.Intn(d)
 }
 
-func RandomAngle() Angle {
-	return Angle(Random(0, 359))
+func RandomAngle() float64 {
+	return float64(Random(0, 359))
 }

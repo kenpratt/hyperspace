@@ -7,11 +7,11 @@ import (
 )
 
 type Ship struct {
-	Id           string `json:"id"`
-	Position     *Point `json:"position"`
-	Angle        Angle  `json:"angle"`
-	Acceleration int8   `json:"acceleration"`
-	Rotation     int8   `json:"rotation"`
+	Id           string  `json:"id"`
+	Position     *Point  `json:"position"`
+	Angle        float64 `json:"angle"`
+	Acceleration int8    `json:"acceleration"`
+	Rotation     int8    `json:"rotation"`
 }
 
 const (
@@ -20,8 +20,7 @@ const (
 
 func (s *Ship) Tick(t uint64) {
 	if s.Rotation != 0 {
-		d := AmountToRotate(s.Rotation, game.constants.ShipRotation, t)
-		s.Angle = AddFloatToAngle(s.Angle, d)
+		s.Angle += AmountToRotate(s.Rotation, game.constants.ShipRotation, t)
 	}
 
 	if s.Acceleration == 1 {
