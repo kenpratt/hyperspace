@@ -20,21 +20,21 @@ func (s *GameState) Tick(time uint64, elapsed uint64) *GameState {
 	t := CreateGameState(time)
 
 	for _, o := range s.Ships {
-		p := o.Tick(elapsed)
+		p := o.Tick(elapsed, s)
 		if p != nil {
 			t.Ships[p.Id] = p
 		}
 	}
 
 	for _, o := range s.Projectiles {
-		p := o.Tick(elapsed)
+		p := o.Tick(elapsed, s)
 		if p != nil {
 			t.Projectiles[p.Id] = p
 		}
 	}
 
 	for _, o := range s.Asteroids {
-		p := o.Tick(elapsed)
+		p := o.Tick(elapsed, s)
 		if p != nil {
 			t.Asteroids[p.Id] = p
 		}

@@ -25,9 +25,9 @@ func CreateProjectile(id string, pos *Point, angle float64, created uint64, owne
 	}
 }
 
-func (p *Projectile) Tick(t uint64) *Projectile {
+func (p *Projectile) Tick(elapsed uint64, state *GameState) *Projectile {
 	// calculate new position
-	x, y := AmountToMove(p.Velocity, t)
+	x, y := AmountToMove(p.Velocity, elapsed)
 	pos := &Point{p.Position.X + x, p.Position.Y + y}
 
 	// calculate new aliveness

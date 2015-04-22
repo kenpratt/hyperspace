@@ -30,11 +30,11 @@ func CreateShip(id string, pos *Point) *Ship {
 	}
 }
 
-func (s *Ship) Tick(t uint64) *Ship {
+func (s *Ship) Tick(elapsed uint64, state *GameState) *Ship {
 	// calculate new angle
 	angle := s.Angle
 	if s.Rotation != 0 {
-		angle = s.Angle + AmountToRotate(s.Rotation, game.constants.ShipRotation, t)
+		angle = s.Angle + AmountToRotate(s.Rotation, game.constants.ShipRotation, elapsed)
 	}
 
 	// calculate new position
@@ -42,13 +42,13 @@ func (s *Ship) Tick(t uint64) *Ship {
 	if s.Acceleration == 1 {
 		// TODO: When we add drift, move velocity to ship struct, and change it due to acceleration
 		velocity := AngleAndSpeedToVector(s.Angle, game.constants.ShipAcceleration)
-		x, y := AmountToMove(velocity, t)
+		x, y := AmountToMove(velocity, elapsed)
 		pos = &Point{s.Position.X + x, s.Position.Y + y}
 	}
 
 	// TODO: Come up with a better way to look up collisions.
 	// From https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
-	for _, os := range game.state.Ships {
+	for _, os := range state.Ships {
 		if os.Id != s.Id {
 			dx := s.Position.X - os.Position.X
 			dy := s.Position.Y - os.Position.Y
@@ -62,7 +62,7 @@ func (s *Ship) Tick(t uint64) *Ship {
 		}
 	}
 
-	for _, p := range game.state.Projectiles {
+	for _, p := range state.Projectiles {
 		dx := s.Position.X - p.Position.X
 		dy := s.Position.Y - p.Position.Y
 		distance := math.Sqrt(float64(dx*dx + dy*dy))

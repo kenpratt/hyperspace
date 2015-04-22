@@ -49,7 +49,7 @@ func (c *Client) run() {
 		case message, ok := <-c.conn.receive:
 			if !ok {
 				log.Println(fmt.Sprintf("Client Stopping: %v", c.playerId))
-				delete(game.state.Ships, c.playerId)
+				game.events <- &RemoveShipEvent{MakeTimestamp(), c.playerId}
 				return
 			}
 			c.handleMessage(message)
@@ -65,29 +65,21 @@ func (c *Client) handleMessage(message *Message) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		game.events <- &ChangeAccelerationEvent{c.playerId, message.Time, data.Direction}
+		game.events <- &ChangeAccelerationEvent{message.Time, c.playerId, data.Direction}
 	case "changeRotation":
 		var data RotationData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		game.events <- &ChangeRotationEvent{c.playerId, message.Time, data.Direction}
+		game.events <- &ChangeRotationEvent{message.Time, c.playerId, data.Direction}
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		game.events <- &FireEvent{
-			PlayerId:     c.playerId,
-			Time:         message.Time,
-			ProjectileId: data.ProjectileId,
-			Created:      data.Created,
-		}
+		game.events <- &FireEvent{message.Time, c.playerId, data.ProjectileId, data.Created}
 	}
 
 }

@@ -22,10 +22,10 @@ type Game struct {
 	unregister chan *Client
 
 	// Inbound events from the clients/AIs.
-	events chan interface{}
+	events chan GameEvent
 
 	// Game objects that currently exist
-	state *GameState
+	history *GameHistory
 
 	// Next valid game object id.
 	nextId int
@@ -61,8 +61,8 @@ func CreateGame() *Game {
 		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		events:     make(chan interface{}),
-		state:      CreateGameState(MakeTimestamp()),
+		events:     make(chan GameEvent, 100),
+		history:    CreateGameHistory(),
 		debug:      false,
 
 		// Game constants, values per second
@@ -73,10 +73,11 @@ func CreateGame() *Game {
 		},
 	}
 
-	// Generate asteroids
+	// Create asteroids
 	for i := 0; i < 100; i++ {
 		id := g.generateId()
-		g.state.Asteroids[id] = CreateAsteroid(id)
+		p, a, v, s := RandomAsteroidGeometry()
+		g.events <- &CreateAsteroidEvent{MakeTimestamp(), id, p, a, v, s}
 	}
 
 	return g
@@ -99,87 +100,31 @@ func (g *Game) run(debug bool) {
 
 			// Create ship
 			id := g.generateId()
-			pos := &Point{X: 0, Y: 0}
-			g.state.Ships[id] = CreateShip(id, pos)
+			g.events <- &CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}}
 
 			// Send game state dump to player
-			c.Initialize(id, g.constants, g.state)
+			c.Initialize(id, g.constants, g.history.CurrentState())
 		case c := <-g.unregister:
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
 		case e := <-g.events:
-			err := g.applyEvent(e)
-			if err != nil {
-				log.Println("Error applying event", e, err)
+			if err := g.history.Exec(e); err != nil {
+				log.Println("Error applying event", err)
 			}
 		case <-gameUpdateTicker.C:
-			// calculate time since last update (in milliseconds)
-			now := MakeTimestamp()
-			elapsed := now - g.state.Time
-
-			// update game state
-			g.state = g.state.Tick(now, elapsed)
+			g.history.Update()
 		case <-clientUpdateTicker.C:
 			g.broadcastUpdate()
-			if err := g.cleanup(); err != nil {
-				log.Println("Error Cleaning Up", err)
-			}
+			g.events <- &CleanupEvent{MakeTimestamp()}
 		}
 	}
-}
-
-func (g *Game) applyEvent(o interface{}) error {
-	switch e := o.(type) {
-	case *ChangeAccelerationEvent:
-		s := g.state.Ships[e.PlayerId]
-		if s == nil {
-			return GameError{"Ship doesn't exist for player"}
-		}
-
-		s.Acceleration = e.Direction
-		return nil
-	case *ChangeRotationEvent:
-		s := g.state.Ships[e.PlayerId]
-		if s == nil {
-			return GameError{"Ship doesn't exist for player"}
-		}
-
-		s.Rotation = e.Direction
-		return nil
-	case *FireEvent:
-		s := g.state.Ships[e.PlayerId]
-		if s == nil {
-			return GameError{"Ship doesn't exist for player"}
-		}
-
-		pos := *s.Position // Clone ship position
-		projectile := CreateProjectile(e.ProjectileId, &pos, s.Angle, e.Created, e.PlayerId)
-		g.state.Projectiles[projectile.Id] = projectile
-		return nil
-	default:
-		return GameError{"Don't know how to apply event"}
-	}
-}
-
-func (g *Game) cleanup() error {
-	dead := []string{}
-
-	for k, v := range g.state.Projectiles {
-		if !v.Alive {
-			dead = append(dead, k)
-		}
-	}
-
-	for i := range dead {
-		delete(g.state.Projectiles, dead[i])
-	}
-
-	return nil
 }
 
 func (g *Game) broadcastUpdate() {
-	b, err := json.Marshal(g.state)
+	state := g.history.CurrentState()
+
+	b, err := json.Marshal(state)
 	if err != nil {
 		panic(err)
 	}
@@ -188,7 +133,7 @@ func (g *Game) broadcastUpdate() {
 	m := &Message{"update", MakeTimestamp(), &raw}
 
 	if g.debug {
-		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(g.state.Ships), len(g.state.Projectiles)))
+		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
 	}
 
 	for c := range g.clients {
