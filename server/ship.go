@@ -30,7 +30,10 @@ func CreateShip(id string, pos *Point) *Ship {
 	}
 }
 
-func (s *Ship) Tick(elapsed uint64, state *GameState) *Ship {
+func (s *Ship) Tick(time uint64, state *GameState) *Ship {
+	// calculate time since last update (in milliseconds)
+	elapsed := time - state.Time
+
 	// calculate new angle
 	angle := s.Angle
 	if s.Rotation != 0 {

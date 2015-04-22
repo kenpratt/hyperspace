@@ -25,14 +25,17 @@ func CreateProjectile(id string, pos *Point, angle float64, created uint64, owne
 	}
 }
 
-func (p *Projectile) Tick(elapsed uint64, state *GameState) *Projectile {
+func (p *Projectile) Tick(time uint64, state *GameState) *Projectile {
+	// calculate time since last update (in milliseconds)
+	elapsed := time - state.Time
+
 	// calculate new position
 	x, y := AmountToMove(p.Velocity, elapsed)
 	pos := &Point{p.Position.X + x, p.Position.Y + y}
 
 	// calculate new aliveness
 	alive := p.Alive
-	if alive && (MakeTimestamp()-p.Created) >= 2000 {
+	if alive && (time-p.Created) >= 2000 {
 		alive = false
 	}
 
