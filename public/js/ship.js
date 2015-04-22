@@ -2,9 +2,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // Create the ship that the current player drives. It differs from all other
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
-  var ship = this.c.entities.create(Ship, {
-    center: data.position,
-    id: data.id,
+  var extra = {
     color:"#f07",
     pressed: {
       forward: false,
@@ -101,19 +99,21 @@ Hyperspace.prototype.addOwnShip = function(data) {
         }
       }
     },
-  });
+  };
+  for (k in extra) { data[k] = extra[k]; }
+  var ship = this.c.entities.create(Ship, data);
   this.ships[data.id] = ship;
   return ship;
 };
 
 Hyperspace.prototype.addEnemyShip = function(data) {
-  var ship = this.c.entities.create(Ship, {
-    id: data.id,
-    center: data.position,
+  var extra = {
     color:"#0f7",
     update: function () {
     },
-  });
+  };
+  for (k in extra) { data[k] = extra[k]; }
+  var ship = this.c.entities.create(Ship, data);
   this.ships[data.id] = ship;
   return ship;
 };
@@ -141,7 +141,8 @@ var Ship = function(game, settings) {
   // This is the size of the ship.
   this.scale = 1.5;
   this.size = { x: 10 * this.scale, y: 10 * this.scale }
-  this.angle = 0;
+
+  this.center = this.position;
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {
