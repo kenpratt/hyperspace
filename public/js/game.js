@@ -25,8 +25,8 @@ var Hyperspace = function(params) {
     center = this.c.renderer.getViewCenter()
     for (var i = this.c.entities.all(Star).length; i < 100; i++) {
       var where = {
-        x: getRandom((center.x - this.size.x/2), (center.x + this.size.x/2)),
-        y: getRandom((center.y - this.size.y/2), (center.y + this.size.y/2)),
+        x: utils.getRandom((center.x - this.size.x/2), (center.x + this.size.x/2)),
+        y: utils.getRandom((center.y - this.size.y/2), (center.y + this.size.y/2)),
       }
       this.c.entities.create(Star, {center: where});
     }

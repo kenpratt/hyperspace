@@ -1,8 +1,8 @@
-function getRandom(min, max) {
-  return Math.random() * (max - min) + min;
-}
+// Lots of random math equations for figuring things out.
 
-// http://stackoverflow.com/a/6444043/1063
+
+// Given a hex (#abcdef) brighten or darken by a percentage.
+// Cribbed from http://stackoverflow.com/a/6444043/1063
 function increaseBrightness(hex, percent) {
   // strip the leading # if it's there
   hex = hex.replace(/^\s*#|\s*$/g, '');
@@ -23,6 +23,9 @@ function increaseBrightness(hex, percent) {
 }
 
 var utils = {
+  getRandom: function(min, max) {
+    return Math.random() * (max - min) + min;
+  },
   angleToVector: function(angle) {
     // Convert to radians.
     var r = angle * 0.01745;
