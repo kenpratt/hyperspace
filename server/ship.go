@@ -38,6 +38,12 @@ func (s *Ship) Tick(time uint64, state *GameState) *Ship {
 	angle := s.Angle
 	if s.Rotation != 0 {
 		angle = s.Angle + AmountToRotate(s.Rotation, settings.constants.ShipRotation, elapsed)
+		for angle < 0 {
+			angle += 360
+		}
+		for angle >= 360 {
+			angle -= 360
+		}
 	}
 
 	// calculate new position
