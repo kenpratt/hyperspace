@@ -99,10 +99,10 @@ func (g *Game) Run() {
 
 			// Create ship
 			id := g.generateId()
-			g.history.Run(&CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}})
+			state := g.history.Run(&CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}})
 
 			// Send game state dump to player
-			c.Initialize(id, settings.constants, g.history.CurrentState())
+			c.Initialize(id, settings.constants, state)
 		case c := <-g.unregister:
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
@@ -110,15 +110,13 @@ func (g *Game) Run() {
 		case <-gameUpdateTicker.C:
 			g.history.Tick()
 		case <-clientUpdateTicker.C:
-			g.broadcastUpdate()
-			g.history.Run(&CleanupEvent{MakeTimestamp()})
+			state := g.history.GetCurrentStateAndClean()
+			g.broadcastUpdate(state)
 		}
 	}
 }
 
-func (g *Game) broadcastUpdate() {
-	state := g.history.CurrentState()
-
+func (g *Game) broadcastUpdate(state *GameState) {
 	b, err := json.Marshal(state)
 	if err != nil {
 		panic(err)

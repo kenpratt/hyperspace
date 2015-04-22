@@ -35,10 +35,14 @@ func CreateGameHistory() *GameHistory {
 	}
 }
 
-func (h *GameHistory) Run(event GameEvent) error {
+func (h *GameHistory) Run(event GameEvent) *GameState {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	return h.run(event)
+}
+
+func (h *GameHistory) run(event GameEvent) *GameState {
 	// find the closest prior entry to inject after
 	previousEl := h.closestPriorHistoryEntry(event.Time())
 
@@ -64,7 +68,7 @@ func (h *GameHistory) Run(event GameEvent) error {
 	}
 
 	h.trim()
-	return nil
+	return h.currentState()
 }
 
 func (h *GameHistory) Tick() error {
@@ -82,19 +86,25 @@ func (h *GameHistory) Tick() error {
 	return nil
 }
 
+func (h *GameHistory) GetCurrentStateAndClean() *GameState {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// save state
+	state := h.currentState()
+
+	// run dead object cleanup
+	h.run(&CleanupEvent{MakeTimestamp()})
+
+	return state
+}
+
 func (h *GameHistory) currentEntry() *GameHistoryEntry {
 	return h.events.Back().Value.(*GameHistoryEntry)
 }
 
 func (h *GameHistory) currentState() *GameState {
 	return h.currentEntry().state
-}
-
-func (h *GameHistory) CurrentState() *GameState {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	return h.currentState()
 }
 
 func (h *GameHistory) trim() {
