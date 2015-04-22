@@ -14,18 +14,16 @@ Hyperspace.prototype.addOwnShip = function(data) {
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function(elapsedMillis) {
-      var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
-
       // This keeps the players ship always in the center.
       this.c.renderer.setViewCenter(this.center);
+
+      // Move ship forward and/or rotate
+      this.applyPhysics(elapsedMillis);
 
       var last_pressed = {};
       for (i in this.pressed) {
         last_pressed[i] = this.pressed[i];
       }
-
-      // The range of Angle is 0 - 360.
-      this.angle %= 360;
 
       // Key pressed booleans
       this.pressed["forward"] =
@@ -44,29 +42,16 @@ Hyperspace.prototype.addOwnShip = function(data) {
         this.c.inputter.isDown(this.c.inputter.D) ||
         this.c.inputter.isDown(this.c.inputter.E);
 
-      // Back and forth movement
-      if (this.pressed["forward"]) {
-        var vector = utils.angleToVector(this.angle);
-        this.center.x += vector.x * this.game.constants.ship_acceleration * elapsed;
-        this.center.y += vector.y * this.game.constants.ship_acceleration * elapsed;
-      } else if (this.pressed["down"]) {
-        // TODO(icco): Support breaking.
-      }
-
-      // Turning.
-      if (this.pressed["right"]) {
-        this.angle += this.game.constants.ship_rotation * elapsed;
-      } else if (this.pressed["left"]) {
-        this.angle -= this.game.constants.ship_rotation * elapsed;
-      }
-
-      // Send server events for key press changes.
+      // Send server events for key press changes (and update local state).
       if (last_pressed['forward'] !== this.pressed['forward']) {
-        this.conn.send("changeAcceleration", { direction: this.pressed['forward'] ? 1 : 0 });
+        var direction = this.pressed['forward'] ? 1 : 0;
+        this.acceleration = direction;
+        this.conn.send("changeAcceleration", { direction: direction });
       }
 
       if (last_pressed['left'] !== this.pressed['left'] || last_pressed['right'] !== this.pressed['right']) {
         var direction = (this.pressed['left'] ? -1 : (this.pressed['right'] ? 1 : 0));
+        this.rotation = direction;
         this.conn.send("changeRotation", { direction: direction });
       }
 
@@ -162,3 +147,23 @@ var Ship = function(game, settings) {
     ctx.fill();
   };
 };
+
+Ship.prototype.applyPhysics = function(elapsedMillis) {
+  if (!this.game.clientUpdatesEnabled) { return; }
+
+  var elapsed = elapsedMillis / 1000;
+
+  // Apply rotation
+  if (this.rotation != 0) {
+    this.angle += this.game.constants.ship_rotation * elapsed * this.rotation;
+    while (this.angle < 0) { this.angle += 360 }
+    while (this.angle >= 360) { this.angle -= 360 }
+  }
+
+  // Apply acceleration
+  if (this.acceleration != 0) {
+    var vector = utils.angleToVector(this.angle);
+    this.center.x += vector.x * this.game.constants.ship_acceleration * elapsed * this.acceleration;
+    this.center.y += vector.y * this.game.constants.ship_acceleration * elapsed * this.acceleration;
+  }
+}
