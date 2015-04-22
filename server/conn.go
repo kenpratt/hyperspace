@@ -59,7 +59,7 @@ func (c *Connection) readPump() {
 			break
 		}
 		if message.Type == "h" {
-			response := &Message{"h", MakeTimestamp(), nil}
+			response := &Message{Type: "h", Time: MakeTimestamp()}
 			c.writeJSON(response)
 			continue
 		}

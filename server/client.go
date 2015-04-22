@@ -13,6 +13,9 @@ type Client struct {
 
 	// ID of the player that this client represents
 	playerId string
+
+	// ID of the last applied event
+	lastAppliedEventId uint64
 }
 
 func makeClient(conn *Connection) *Client {
@@ -30,7 +33,7 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 		panic(err)
 	}
 	raw := json.RawMessage(b)
-	c.Send(&Message{"init", MakeTimestamp(), &raw})
+	c.Send(&Message{Type: "init", Time: MakeTimestamp(), Data: &raw})
 
 	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
 
@@ -66,6 +69,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 		game.history.Run(&ChangeAccelerationEvent{message.Time, c.playerId, data.Direction})
+		c.updateLastAppliedEvent(data.EventId)
 	case "changeRotation":
 		var data RotationData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -73,6 +77,7 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 		game.history.Run(&ChangeRotationEvent{message.Time, c.playerId, data.Direction})
+		c.updateLastAppliedEvent(data.EventId)
 	case "fire":
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
@@ -80,8 +85,27 @@ func (c *Client) handleMessage(message *Message) {
 			log.Fatal(err)
 		}
 		game.history.Run(&FireEvent{message.Time, c.playerId, data.ProjectileId, data.Created})
+		c.updateLastAppliedEvent(data.EventId)
 	}
 
+}
+
+func (c *Client) updateLastAppliedEvent(eventId uint64) {
+	if eventId > c.lastAppliedEventId {
+		c.lastAppliedEventId = eventId
+	} else {
+		log.Fatal("got a weird event id", c.lastAppliedEventId, eventId)
+	}
+}
+
+func (c *Client) SendUpdate(state *GameState) {
+	b, err := json.Marshal(&UpdateData{state, c.lastAppliedEventId})
+	if err != nil {
+		panic(err)
+	}
+
+	raw := json.RawMessage(b)
+	c.Send(&Message{Type: "update", Time: MakeTimestamp(), Data: &raw})
 }
 
 func (c *Client) Send(message *Message) {
