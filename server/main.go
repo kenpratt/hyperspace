@@ -18,7 +18,8 @@ func main() {
 	http.Handle("/", fs)
 
 	// Run the game simulation
-	go game.run(*debugPtr)
+	settings.debug = *debugPtr
+	go game.Run()
 
 	fmt.Println("Starting web server on http://localhost:9393/")
 	err := http.ListenAndServe(fmt.Sprintf(":%d", *portPtr), nil)

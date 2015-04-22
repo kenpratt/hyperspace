@@ -19,7 +19,7 @@ func CreateProjectile(id string, pos *Point, angle float64, created uint64, owne
 		Id:       id,
 		Alive:    true,
 		Position: pos,
-		Velocity: AngleAndSpeedToVector(angle, game.constants.ProjectileSpeed),
+		Velocity: AngleAndSpeedToVector(angle, settings.constants.ProjectileSpeed),
 		Created:  created,
 		Owner:    owner,
 	}

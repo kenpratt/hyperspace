@@ -34,14 +34,14 @@ func (s *Ship) Tick(elapsed uint64, state *GameState) *Ship {
 	// calculate new angle
 	angle := s.Angle
 	if s.Rotation != 0 {
-		angle = s.Angle + AmountToRotate(s.Rotation, game.constants.ShipRotation, elapsed)
+		angle = s.Angle + AmountToRotate(s.Rotation, settings.constants.ShipRotation, elapsed)
 	}
 
 	// calculate new position
 	pos := s.Position
 	if s.Acceleration == 1 {
 		// TODO: When we add drift, move velocity to ship struct, and change it due to acceleration
-		velocity := AngleAndSpeedToVector(s.Angle, game.constants.ShipAcceleration)
+		velocity := AngleAndSpeedToVector(s.Angle, settings.constants.ShipAcceleration)
 		x, y := AmountToMove(velocity, elapsed)
 		pos = &Point{s.Position.X + x, s.Position.Y + y}
 	}
@@ -55,7 +55,7 @@ func (s *Ship) Tick(elapsed uint64, state *GameState) *Ship {
 			distance := math.Sqrt(float64(dx*dx + dy*dy))
 
 			if distance < ShipRadius*2 {
-				if game.debug {
+				if settings.debug {
 					log.Println(fmt.Sprintf("Ship %v colliding with Ship %v", s.Id, os.Id))
 				}
 			}
@@ -68,7 +68,7 @@ func (s *Ship) Tick(elapsed uint64, state *GameState) *Ship {
 		distance := math.Sqrt(float64(dx*dx + dy*dy))
 
 		if distance < ShipRadius+ProjectileRadius {
-			if game.debug {
+			if settings.debug {
 				log.Println(fmt.Sprintf("Ship %v colliding with Projectile %v", s.Id, p.Id))
 			}
 		}

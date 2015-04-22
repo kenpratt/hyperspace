@@ -9,9 +9,6 @@ import (
 )
 
 type Game struct {
-	// All the important game variables
-	constants *GameConstants
-
 	// Registered clients.
 	clients map[*Client]bool
 
@@ -26,6 +23,11 @@ type Game struct {
 
 	// Next valid game object id.
 	nextId int
+}
+
+type GameSettings struct {
+	// All the important game variables
+	constants *GameConstants
 
 	// Whether or not to print debug messages.
 	debug bool
@@ -51,6 +53,16 @@ const (
 )
 
 // TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
+var settings = &GameSettings{
+	debug: false,
+
+	// Game constants, values are all per-second
+	constants: &GameConstants{
+		ShipAcceleration: 100, // Pixels per second
+		ShipRotation:     100, // Degrees per second
+		ProjectileSpeed:  150, // Pixels per second
+	},
+}
 var game = CreateGame()
 
 func CreateGame() *Game {
@@ -59,14 +71,6 @@ func CreateGame() *Game {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		history:    CreateGameHistory(),
-		debug:      false,
-
-		// Game constants, values per second
-		constants: &GameConstants{
-			ShipAcceleration: 100, // Pixels per second
-			ShipRotation:     100, // Degrees per second
-			ProjectileSpeed:  150, // Pixels per second
-		},
 	}
 
 	// Create asteroids
@@ -79,8 +83,7 @@ func CreateGame() *Game {
 	return g
 }
 
-func (g *Game) run(debug bool) {
-	g.debug = debug
+func (g *Game) Run() {
 	gameUpdateTicker := time.NewTicker(gameUpdatePeriod)
 	clientUpdateTicker := time.NewTicker(clientUpdatePeriod)
 	defer func() {
@@ -99,7 +102,7 @@ func (g *Game) run(debug bool) {
 			g.history.Run(&CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}})
 
 			// Send game state dump to player
-			c.Initialize(id, g.constants, g.history.CurrentState())
+			c.Initialize(id, settings.constants, g.history.CurrentState())
 		case c := <-g.unregister:
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
@@ -124,7 +127,7 @@ func (g *Game) broadcastUpdate() {
 	raw := json.RawMessage(b)
 	m := &Message{"update", MakeTimestamp(), &raw}
 
-	if g.debug {
+	if settings.debug {
 		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
 	}
 

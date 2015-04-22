@@ -12,24 +12,59 @@ type GameHistory struct {
 	mu     sync.Mutex
 }
 
-type HistoryEntry struct {
-	time uint64
-	fn   StateMutationFunction
+type GameHistoryEntry struct {
+	time  uint64
+	state *GameState
+	event GameEvent
 }
+
+const (
+	msToKeepHistoryEvents = 10000
+)
 
 func CreateGameHistory() *GameHistory {
 	events := list.New()
-	events.PushBack(CreateGameState(MakeTimestamp()))
+
+	// create event for initial game state
+	now := MakeTimestamp()
+	state := CreateGameState(now)
+	events.PushBack(&GameHistoryEntry{now, state, nil})
+
 	return &GameHistory{
 		events: events,
 	}
 }
 
-func (h *GameHistory) Run(e GameEvent) error {
+func (h *GameHistory) Run(event GameEvent) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	return e.Execute(h.currentState())
+	// find the closest prior entry to inject after
+	previousEl := h.closestPriorHistoryEntry(event.Time())
+
+	// inject the new entry
+	el := h.events.InsertAfter(&GameHistoryEntry{event.Time(), nil, event}, previousEl)
+
+	// re-write history from the element forward
+	for el != nil {
+		curr := el.Value.(*GameHistoryEntry)
+		prev := el.Prev().Value.(*GameHistoryEntry)
+
+		// play physics from previous state to time of current el (immutable update, returns new state)
+		curr.state = prev.state.Tick(curr.time)
+
+		// apply current event, if defined
+		if curr.event != nil {
+			// execute the event code (mutable update on state passed in)
+			curr.event.Execute(curr.state)
+		}
+
+		// proceed to next element
+		el = el.Next()
+	}
+
+	h.trim()
+	return nil
 }
 
 func (h *GameHistory) Tick() error {
@@ -40,9 +75,19 @@ func (h *GameHistory) Tick() error {
 	oldState := h.currentState()
 
 	// update game state
-	newState := oldState.Tick(MakeTimestamp())
-	h.events.PushBack(newState)
+	now := MakeTimestamp()
+	newState := oldState.Tick(now)
+	h.events.PushBack(&GameHistoryEntry{now, newState, nil})
+	h.trim()
 	return nil
+}
+
+func (h *GameHistory) currentEntry() *GameHistoryEntry {
+	return h.events.Back().Value.(*GameHistoryEntry)
+}
+
+func (h *GameHistory) currentState() *GameState {
+	return h.currentEntry().state
 }
 
 func (h *GameHistory) CurrentState() *GameState {
@@ -52,6 +97,18 @@ func (h *GameHistory) CurrentState() *GameState {
 	return h.currentState()
 }
 
-func (h *GameHistory) currentState() *GameState {
-	return h.events.Back().Value.(*GameState)
+func (h *GameHistory) trim() {
+	now := MakeTimestamp()
+	for el := h.events.Front(); el != nil && (now-el.Value.(*GameHistoryEntry).time) > msToKeepHistoryEvents; el = h.events.Front() {
+		h.events.Remove(el)
+	}
+}
+
+func (h *GameHistory) closestPriorHistoryEntry(t uint64) *list.Element {
+	for e := h.events.Back(); e != nil; e = e.Prev() {
+		if e.Value.(*GameHistoryEntry).time <= t {
+			return e
+		}
+	}
+	return nil
 }
