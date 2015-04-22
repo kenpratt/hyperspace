@@ -21,9 +21,6 @@ type Game struct {
 	// Unregister requests from clients.
 	unregister chan *Client
 
-	// Inbound events from the clients/AIs.
-	events chan GameEvent
-
 	// Game objects that currently exist
 	history *GameHistory
 
@@ -61,7 +58,6 @@ func CreateGame() *Game {
 		clients:    make(map[*Client]bool),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		events:     make(chan GameEvent, 100),
 		history:    CreateGameHistory(),
 		debug:      false,
 
@@ -77,7 +73,7 @@ func CreateGame() *Game {
 	for i := 0; i < 100; i++ {
 		id := g.generateId()
 		p, a, v, s := RandomAsteroidGeometry()
-		g.events <- &CreateAsteroidEvent{MakeTimestamp(), id, p, a, v, s}
+		g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, p, a, v, s})
 	}
 
 	return g
@@ -100,7 +96,7 @@ func (g *Game) run(debug bool) {
 
 			// Create ship
 			id := g.generateId()
-			g.events <- &CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}}
+			g.history.Run(&CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}})
 
 			// Send game state dump to player
 			c.Initialize(id, g.constants, g.history.CurrentState())
@@ -108,15 +104,11 @@ func (g *Game) run(debug bool) {
 			if _, ok := g.clients[c]; ok {
 				delete(g.clients, c)
 			}
-		case e := <-g.events:
-			if err := g.history.Exec(e); err != nil {
-				log.Println("Error applying event", err)
-			}
 		case <-gameUpdateTicker.C:
 			g.history.Update()
 		case <-clientUpdateTicker.C:
 			g.broadcastUpdate()
-			g.events <- &CleanupEvent{MakeTimestamp()}
+			g.history.Run(&CleanupEvent{MakeTimestamp()})
 		}
 	}
 }

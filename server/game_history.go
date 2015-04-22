@@ -2,12 +2,14 @@ package main
 
 import (
 	"container/list"
+	"sync"
 )
 
 type StateMutationFunction func(*GameState) error
 
 type GameHistory struct {
 	events *list.List
+	mu     sync.Mutex
 }
 
 type HistoryEntry struct {
@@ -23,13 +25,19 @@ func CreateGameHistory() *GameHistory {
 	}
 }
 
-func (h *GameHistory) Exec(e GameEvent) error {
-	return e.Execute(h.CurrentState())
+func (h *GameHistory) Run(e GameEvent) error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	return e.Execute(h.currentState())
 }
 
 func (h *GameHistory) Update() error {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	// get last game state
-	state := h.CurrentState()
+	state := h.currentState()
 
 	// calculate time since last update (in milliseconds)
 	now := MakeTimestamp()
@@ -41,5 +49,12 @@ func (h *GameHistory) Update() error {
 }
 
 func (h *GameHistory) CurrentState() *GameState {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	return h.currentState()
+}
+
+func (h *GameHistory) currentState() *GameState {
 	return h.events.Back().Value.(*GameState)
 }
