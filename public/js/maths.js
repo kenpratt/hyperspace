@@ -74,3 +74,18 @@ var utils = {
     }
   },
 }
+
+var collision = {
+  circles: function(x1, y1, r1, x2, y2, r2) {
+    var dx = x2 - x1;
+    var dy = y2 - y1;
+    var distance = Math.sqrt(dx*dx + dy*dy);
+    return (distance < r1 + r2);
+  },
+
+  squares: function(x2, y2, w2, h2, x2, y2, w2, h2) {
+    var x_intersect = Math.abs(x1 - x2) * 2 < (w1 + w2);
+    var y_intersect = Math.abs(y1 - y2) * 2 < (h1 + h2);
+    return x_intersect && y_intersect;
+  }
+}
