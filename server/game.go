@@ -105,7 +105,7 @@ func (g *Game) run(debug bool) {
 				delete(g.clients, c)
 			}
 		case <-gameUpdateTicker.C:
-			g.history.Update()
+			g.history.Tick()
 		case <-clientUpdateTicker.C:
 			g.broadcastUpdate()
 			g.history.Run(&CleanupEvent{MakeTimestamp()})

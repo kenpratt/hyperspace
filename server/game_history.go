@@ -32,19 +32,16 @@ func (h *GameHistory) Run(e GameEvent) error {
 	return e.Execute(h.currentState())
 }
 
-func (h *GameHistory) Update() error {
+func (h *GameHistory) Tick() error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	// get last game state
-	state := h.currentState()
-
-	// calculate time since last update (in milliseconds)
-	now := MakeTimestamp()
-	elapsed := now - state.Time
+	oldState := h.currentState()
 
 	// update game state
-	h.events.PushBack(state.Tick(now, elapsed))
+	newState := oldState.Tick(MakeTimestamp())
+	h.events.PushBack(newState)
 	return nil
 }
 

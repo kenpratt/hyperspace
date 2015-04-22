@@ -16,7 +16,11 @@ func CreateGameState(time uint64) *GameState {
 	}
 }
 
-func (s *GameState) Tick(time uint64, elapsed uint64) *GameState {
+func (s *GameState) Tick(time uint64) *GameState {
+	// calculate time since last update (in milliseconds)
+	elapsed := time - s.Time
+
+	// create new state
 	t := CreateGameState(time)
 
 	for _, o := range s.Ships {
