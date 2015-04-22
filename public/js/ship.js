@@ -110,7 +110,9 @@ Hyperspace.prototype.addEnemyShip = function(data) {
   var ship = this.c.entities.create(Ship, {
     id: data.id,
     center: data.position,
-    color:"#0f7"
+    color:"#0f7",
+    update: function () {
+    },
   });
   this.ships[data.id] = ship;
   return ship;
