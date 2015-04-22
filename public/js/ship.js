@@ -94,7 +94,8 @@ Hyperspace.prototype.addOwnShip = function(data) {
 Hyperspace.prototype.addEnemyShip = function(data) {
   var extra = {
     color:"#0f7",
-    update: function () {
+    update: function(elapsedMillis) {
+      this.applyPhysics(elapsedMillis);
     },
   };
   for (k in extra) { data[k] = extra[k]; }
