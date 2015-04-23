@@ -7,39 +7,39 @@ type GameState struct {
 	Asteroids   map[string]*Asteroid   `json:"asteroids"`
 }
 
-func CreateGameState(time uint64) *GameState {
+func CreateGameState(t uint64) *GameState {
 	return &GameState{
-		Time:        time,
+		Time:        t,
 		Ships:       make(map[string]*Ship),
 		Projectiles: make(map[string]*Projectile),
 		Asteroids:   make(map[string]*Asteroid),
 	}
 }
 
-func (s *GameState) Tick(time uint64) *GameState {
+func (s *GameState) Tick(t uint64) *GameState {
 	// create new state
-	t := CreateGameState(time)
+	state := CreateGameState(t)
 
 	for _, o := range s.Ships {
-		p := o.Tick(time, s)
+		p := o.Tick(t, s)
 		if p != nil {
-			t.Ships[p.Id] = p
+			state.Ships[p.Id] = p
 		}
 	}
 
 	for _, o := range s.Projectiles {
-		p := o.Tick(time, s)
+		p := o.Tick(t, s)
 		if p != nil {
-			t.Projectiles[p.Id] = p
+			state.Projectiles[p.Id] = p
 		}
 	}
 
 	for _, o := range s.Asteroids {
-		p := o.Tick(time, s)
+		p := o.Tick(t, s)
 		if p != nil {
-			t.Asteroids[p.Id] = p
+			state.Asteroids[p.Id] = p
 		}
 	}
 
-	return t
+	return state
 }

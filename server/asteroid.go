@@ -42,9 +42,9 @@ func CreateAsteroid(id string, p *Point, a float64, v *Vector, s []*Point) *Aste
 	}
 }
 
-func (a *Asteroid) Tick(time uint64, state *GameState) *Asteroid {
+func (a *Asteroid) Tick(t uint64, state *GameState) *Asteroid {
 	// calculate time since last update (in milliseconds)
-	elapsed := time - state.Time
+	elapsed := t - state.Time
 
 	// calculate new position
 	x, y := AmountToMove(a.Velocity, elapsed)
