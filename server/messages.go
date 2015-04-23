@@ -18,15 +18,23 @@ type InitData struct {
 	State     *GameState     `json:"state"`
 }
 
+type UpdateData struct {
+	State       *GameState `json:"state"`
+	LastEventId uint64     `json:"lastEvent"`
+}
+
 type FireData struct {
+	EventId      uint64 `json:"eventId"`
 	ProjectileId string `json:"projectileId"`
 	Created      uint64 `json:"created"`
 }
 
 type AccelerationData struct {
-	Direction int8 `json:"direction"`
+	EventId   uint64 `json:"eventId"`
+	Direction int8   `json:"direction"`
 }
 
 type RotationData struct {
-	Direction int8 `json:"direction"`
+	EventId   uint64 `json:"eventId"`
+	Direction int8   `json:"direction"`
 }

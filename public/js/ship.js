@@ -10,6 +10,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
       left: false,
       right: false,
     },
+    lastEventId: 0,
 
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
@@ -46,13 +47,13 @@ Hyperspace.prototype.addOwnShip = function(data) {
       if (last_pressed['forward'] !== this.pressed['forward']) {
         var direction = this.pressed['forward'] ? 1 : 0;
         this.acceleration = direction;
-        this.conn.send("changeAcceleration", { direction: direction });
+        this.send("changeAcceleration", { direction: direction });
       }
 
       if (last_pressed['left'] !== this.pressed['left'] || last_pressed['right'] !== this.pressed['right']) {
         var direction = (this.pressed['left'] ? -1 : (this.pressed['right'] ? 1 : 0));
         this.rotation = direction;
-        this.conn.send("changeRotation", { direction: direction });
+        this.send("changeRotation", { direction: direction });
       }
 
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
@@ -71,18 +72,23 @@ Hyperspace.prototype.addOwnShip = function(data) {
           });
 
           // Send an event (a cause of a thing) that describes what just happened.
-          this.conn.send("fire", {
+          this.send("fire", {
             projectileId: projectile.id,
             created: projectile.created,
           });
         } else {
           // Send an event (a cause of a thing) that describes what just happened.
-          this.conn.send("fire", {
+          this.send("fire", {
             projectileId: projectileId,
             created: this.conn.now(),
           });
         }
       }
+    },
+    send: function(type, data) {
+      var eventId = ++this.lastEventId;
+      data.eventId = eventId;
+      this.conn.send(type, data);
     },
   };
   for (k in extra) { data[k] = extra[k]; }

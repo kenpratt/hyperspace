@@ -42,7 +42,7 @@ var Hyperspace = function(params) {
   this.conn.handle("init", function(data) {
     this.playerId = data.playerId;
     this.constants = data.constants;
-    this.handleUpdate(data.state);
+    this.handleUpdate(data);
   }.bind(this));
 
   this.conn.handle("update", function(data) {
@@ -52,21 +52,31 @@ var Hyperspace = function(params) {
   }.bind(this));
 };
 
-Hyperspace.prototype.handleUpdate = function(state) {
+Hyperspace.prototype.handleUpdate = function(updateData) {
+  var state = updateData.state;
   var elapsed = this.conn.now() - state.time;
+  var lastAppliedEventId = updateData.lastEvent;
 
   // add/update ships
   for (id in state.ships) {
     var data = state.ships[id];
     var obj = this.ships[id];
     if (obj) {
+      // Check if we should skip this update
+      if (id === this.playerId) {
+        if (obj.lastEventId > lastAppliedEventId) {
+          // TODO: Instead of skipping update entirely, just update life total and alive status
+          continue;
+        }
+      }
+
       // console.log("Updating ship", data);
       for (f in data) {
         obj[f] = data[f];
       }
       obj.center = obj.position; // update center alias for position
     } else {
-      if (data.id === this.playerId) {
+      if (id === this.playerId) {
         // console.log("Adding own ship");
         obj = this.addOwnShip(data);
       } else {
@@ -75,7 +85,8 @@ Hyperspace.prototype.handleUpdate = function(state) {
       }
     }
 
-    // simulate physics since server sent this message
+    // Simulate physics since server sent this message
+    // TODO: Just update physics, not key positions and such
     obj.update(elapsed);
   }
 
@@ -94,7 +105,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
       obj = this.addProjectile(data);
     }
 
-    // simulate physics since server sent this message
+    // Simulate physics since server sent this message
     obj.update(elapsed);
   }
 
@@ -123,7 +134,7 @@ Hyperspace.prototype.handleUpdate = function(state) {
       obj = this.addAsteroid(data);
     }
 
-    // simulate physics since server sent this message
+    // Simulate physics since server sent this message
     obj.update(elapsed);
   }
 };

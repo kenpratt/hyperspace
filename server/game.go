@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -117,20 +116,12 @@ func (g *Game) Run() {
 }
 
 func (g *Game) broadcastUpdate(state *GameState) {
-	b, err := json.Marshal(state)
-	if err != nil {
-		panic(err)
-	}
-
-	raw := json.RawMessage(b)
-	m := &Message{"update", MakeTimestamp(), &raw}
-
 	if settings.debug {
 		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
 	}
 
 	for c := range g.clients {
-		c.Send(m)
+		c.SendUpdate(state)
 	}
 }
 

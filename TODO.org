@@ -23,3 +23,4 @@
 * TODO Spawn animation
 * TODO Minimap/radar and/or arrows indication direction to off-screen enemies
 * TODO Use gopherjs (https://github.com/gopherjs/gopherjs) to sync game object construct and simulation logic?
+* TODO JSON stringify update message before sending to each client
