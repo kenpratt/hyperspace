@@ -3,10 +3,11 @@ GO_FILES = $(wildcard server/*.go)
 
 local: clean
 	make restart
-	fswatch -o . | xargs -n1 -I{} make restart || make kill
+	fswatch -0 server/*.go | xargs -0 -n 1 -I {} make restart || make kill
 
 kill:
 	[ -f $(PID) ] && kill -9 `cat $(PID)` || true
+	make clean
 
 restart:
 	make kill
@@ -15,6 +16,6 @@ restart:
 
 clean:
 	rm -f server/server
-	rm -f $PID
+	rm -f $(PID)
 
 .PHONY: serve restart kill clean
