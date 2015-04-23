@@ -163,12 +163,15 @@ Ship.prototype.applyPhysics = function(elapsedMillis) {
     this.angle += this.game.constants.ship_rotation * elapsed * this.rotation;
     while (this.angle < 0) { this.angle += 360 }
     while (this.angle >= 360) { this.angle -= 360 }
+    this.angle = utils.roundToPlaces(this.angle, 1);
   }
 
   // Apply acceleration
   if (this.acceleration != 0) {
     var vector = utils.angleToVector(this.angle);
-    this.center.x += vector.x * this.game.constants.ship_acceleration * elapsed * this.acceleration;
-    this.center.y += vector.y * this.game.constants.ship_acceleration * elapsed * this.acceleration;
+
+    this.center.x = utils.roundToPlaces(this.center.x + vector.x * this.game.constants.ship_acceleration * elapsed * this.acceleration, 1);
+    this.center.y = utils.roundToPlaces(this.center.y + vector.y * this.game.constants.ship_acceleration * elapsed * this.acceleration, 1);
+
   }
 }

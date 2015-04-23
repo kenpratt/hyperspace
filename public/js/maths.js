@@ -73,6 +73,10 @@ var utils = {
       return sum / (length < period ? length : period);
     }
   },
+  roundToPlaces: function(f, places) {
+    var shift = Math.pow(10, places);
+    return Math.round(f*shift) / shift;
+  },
 }
 
 var collision = {

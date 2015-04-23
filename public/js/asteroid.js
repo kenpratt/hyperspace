@@ -18,8 +18,8 @@ var Asteroid = function(game, settings) {
   this.update = function(elapsedMillis) {
     var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
 
-    this.center.x += this.velocity.x * elapsed;
-    this.center.y += this.velocity.y * elapsed;
+    this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
+    this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
   };
 
   this.draw = function(ctx) {
