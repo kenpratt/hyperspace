@@ -94,7 +94,7 @@ func (c *Client) updateLastAppliedEvent(eventId uint64) {
 	if eventId > c.lastAppliedEventId {
 		c.lastAppliedEventId = eventId
 	} else {
-		log.Fatal("got a weird event id", c.lastAppliedEventId, eventId)
+		log.Fatalf("Client got out-of-order event id: %d, %d", c.lastAppliedEventId, eventId)
 	}
 }
 
