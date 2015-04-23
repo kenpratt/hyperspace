@@ -32,6 +32,8 @@ sudo EDITOR=emacs visudo
 ```
 
 ```
+hyperspace ALL=(ALL) NOPASSWD: /home/hyperspace/hyperspace/bin/start
+hyperspace ALL=(ALL) NOPASSWD: /home/hyperspace/hyperspace/bin/stop
 hyperspace ALL=(ALL) NOPASSWD: /home/hyperspace/hyperspace/bin/restart
 ```
 
