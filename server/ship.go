@@ -44,6 +44,7 @@ func (s *Ship) Tick(t uint64, state *GameState) *Ship {
 		for angle >= 360 {
 			angle -= 360
 		}
+		angle = RoundToPlaces(angle, 1)
 	}
 
 	// calculate new position
@@ -52,7 +53,7 @@ func (s *Ship) Tick(t uint64, state *GameState) *Ship {
 		// TODO: When we add drift, move velocity to ship struct, and change it due to acceleration
 		velocity := AngleAndSpeedToVector(s.Angle, settings.constants.ShipAcceleration)
 		x, y := AmountToMove(velocity, elapsed)
-		pos = &Point{s.Position.X + x, s.Position.Y + y}
+		pos = MakePoint(s.Position.X+x, s.Position.Y+y)
 	}
 
 	// TODO: Come up with a better way to look up collisions.

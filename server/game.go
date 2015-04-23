@@ -98,7 +98,7 @@ func (g *Game) Run() {
 
 			// Create ship
 			id := g.generateId()
-			state := g.history.Run(&CreateShipEvent{MakeTimestamp(), id, &Point{X: 0, Y: 0}})
+			state := g.history.Run(&CreateShipEvent{MakeTimestamp(), id, MakePoint(0, 0)})
 
 			// Send game state dump to player
 			c.Initialize(id, settings.constants, state)

@@ -19,7 +19,7 @@ func CreateProjectile(id string, pos *Point, angle float64, created uint64, owne
 		Id:       id,
 		Alive:    true,
 		Position: pos,
-		Velocity: AngleAndSpeedToVector(angle, settings.constants.ProjectileSpeed),
+		Velocity: RoundVector(AngleAndSpeedToVector(angle, settings.constants.ProjectileSpeed)),
 		Created:  created,
 		Owner:    owner,
 	}
@@ -31,7 +31,7 @@ func (p *Projectile) Tick(t uint64, state *GameState) *Projectile {
 
 	// calculate new position
 	x, y := AmountToMove(p.Velocity, elapsed)
-	pos := &Point{p.Position.X + x, p.Position.Y + y}
+	pos := MakePoint(p.Position.X+x, p.Position.Y+y)
 
 	// calculate new aliveness
 	alive := p.Alive

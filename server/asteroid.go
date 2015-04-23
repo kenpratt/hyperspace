@@ -12,7 +12,7 @@ type Asteroid struct {
 func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 	sides := Random(6, 9)
 	shape := make([]*Point, sides)
-	shape[0] = &Point{0, 0}
+	shape[0] = MakePoint(0, 0)
 	last := shape[0]
 	totalAngle := 0.0
 	for i := 1; i < sides; i++ {
@@ -20,14 +20,14 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 		totalAngle += float64(Random(a-5, a+5))
 		l := Random(8, 15)
 		v := AngleToVector(totalAngle)
-		c := &Point{last.X + v.X*float64(l), last.Y + v.Y*float64(l)}
+		c := MakePoint(last.X+v.X*float64(l), last.Y+v.Y*float64(l))
 		shape[i] = c
 		last = c
 	}
 
-	return &Point{float64(Random(-1000, 1000)), float64(Random(-1000, 1000))},
+	return MakePoint(float64(Random(-1000, 1000)), float64(Random(-1000, 1000))),
 		RandomAngle(),
-		AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50))),
+		RoundVector(AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50)))),
 		shape
 }
 
@@ -48,7 +48,7 @@ func (a *Asteroid) Tick(t uint64, state *GameState) *Asteroid {
 
 	// calculate new position
 	x, y := AmountToMove(a.Velocity, elapsed)
-	pos := &Point{a.Position.X + x, a.Position.Y + y}
+	pos := MakePoint(a.Position.X+x, a.Position.Y+y)
 
 	// return copy of object with new position
 	return &Asteroid{

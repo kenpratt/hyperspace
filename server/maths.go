@@ -16,6 +16,27 @@ type Vector struct {
 	Y float64 `json:"y"`
 }
 
+func MakePoint(x float64, y float64) *Point {
+	return &Point{RoundToPlaces(x, 1), RoundToPlaces(y, 1)}
+}
+
+func Round(f float64) float64 {
+	return math.Floor(f + 0.5)
+}
+
+func RoundToPlaces(f float64, places int) float64 {
+	shift := math.Pow(10, float64(places))
+	return Round(f*shift) / shift
+}
+
+func RoundPoint(p *Point) *Point {
+	return &Point{RoundToPlaces(p.X, 1), RoundToPlaces(p.Y, 1)}
+}
+
+func RoundVector(v *Vector) *Vector {
+	return &Vector{RoundToPlaces(v.X, 1), RoundToPlaces(v.Y, 1)}
+}
+
 // Converts an angle in degrees between 0 and 359.
 func AngleToVector(angle float64) *Vector {
 	// Convert to radians.
