@@ -16,8 +16,6 @@ var Projectile = function(game, settings) {
     this[i] = settings[i];
   }
 
-  this.center = this.position;
-
   this.update = function(elapsedMillis) {
     var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
 

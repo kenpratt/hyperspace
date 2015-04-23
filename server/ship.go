@@ -7,12 +7,12 @@ import (
 )
 
 type Ship struct {
-	Id           string  `json:"id"`
-	Alive        bool    `json:"alive"`
-	Position     *Point  `json:"position"`
-	Angle        float64 `json:"angle"`
-	Acceleration int8    `json:"acceleration"`
-	Rotation     int8    `json:"rotation"`
+	Id           string  `json:"i"`
+	Alive        bool    `json:"z"`
+	Position     *Point  `json:"p"`
+	Angle        float64 `json:"a"`
+	Acceleration int8    `json:"l"`
+	Rotation     int8    `json:"r"`
 }
 
 const (

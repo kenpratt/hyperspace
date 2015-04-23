@@ -52,6 +52,26 @@ var Hyperspace = function(params) {
   }.bind(this));
 };
 
+var serverObjectFieldMap = {
+  i: "id",
+  z: "alive",
+  p: "center",
+  a: "angle",
+  v: "velocity",
+  s: "shape",
+  l: "acceleration",
+  r: "rotation",
+  c: "created",
+  o: "owner",
+}
+
+var copyGameObjectData = function(obj, dataFromServer) {
+  for (f in dataFromServer) {
+    obj[serverObjectFieldMap[f]] = dataFromServer[f];
+  }
+  return obj;
+}
+
 Hyperspace.prototype.handleUpdate = function(updateData) {
   var state = updateData.state;
   var elapsed = this.conn.now() - state.time;
@@ -71,17 +91,14 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
       }
 
       // console.log("Updating ship", data);
-      for (f in data) {
-        obj[f] = data[f];
-      }
-      obj.center = obj.position; // update center alias for position
+      copyGameObjectData(obj, data);
     } else {
       if (id === this.playerId) {
         // console.log("Adding own ship");
-        obj = this.addOwnShip(data);
+        obj = this.addOwnShip(copyGameObjectData({}, data));
       } else {
         // console.log("Adding enemy ship");
-        obj = this.addEnemyShip(data);
+        obj = this.addEnemyShip(copyGameObjectData({}, data));
       }
     }
 
@@ -96,13 +113,10 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     var obj = this.projectiles[id];
     if (obj) {
       // console.log("Updating projectile", data);
-      for (f in data) {
-        obj[f] = data[f];
-      }
-      obj.center = obj.position; // update center alias for position
+      copyGameObjectData(obj, data);
     } else {
       // console.log("Adding projectile", data);
-      obj = this.addProjectile(data);
+      obj = this.addProjectile(copyGameObjectData({}, data));
     }
 
     // Simulate physics since server sent this message
@@ -125,13 +139,10 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     var obj = this.asteroids[id];
     if (obj) {
       // console.log("Updating asteroid", data);
-      for (f in data) {
-        obj[f] = data[f];
-      }
-      obj.center = obj.position; // update center alias for position
+      copyGameObjectData(obj, data);
     } else {
       // console.log("Adding asteroid");
-      obj = this.addAsteroid(data);
+      obj = this.addAsteroid(copyGameObjectData({}, data));
     }
 
     // Simulate physics since server sent this message

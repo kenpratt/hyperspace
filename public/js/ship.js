@@ -65,7 +65,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
           var projectile = this.game.addProjectile({
             id: projectileId,
             alive: true,
-            position: { x:this.center.x, y:this.center.y },
+            center: { x:this.center.x, y:this.center.y },
             velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
             angle: this.angle,
             owner: this.id,
@@ -133,8 +133,6 @@ var Ship = function(game, settings) {
   // This is the size of the ship.
   this.scale = 1.5;
   this.size = { x: 10 * this.scale, y: 10 * this.scale }
-
-  this.center = this.position;
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {

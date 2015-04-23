@@ -14,7 +14,6 @@ var Asteroid = function(game, settings) {
 
   this.size = { x: 10, y: 10 };
   this.zindex = -1;
-  this.center = this.position;
 
   this.update = function(elapsedMillis) {
     var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
