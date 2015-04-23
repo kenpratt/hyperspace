@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 type GameState struct {
 	Time        uint64                 `json:"time"`
 	Ships       map[string]*Ship       `json:"ships"`
@@ -17,6 +19,13 @@ func CreateGameState(t uint64) *GameState {
 }
 
 func (s *GameState) Tick(t uint64) *GameState {
+	if t < s.Time {
+		log.Fatalf("Tried to call tick with timestamp lower than previous tick: %d, %d", s.Time, t)
+		return nil
+	}
+
+	// TODO: If t == s.Time, do a clone of game objects and return, since no time will have elapsed?
+
 	// create new state
 	state := CreateGameState(t)
 
