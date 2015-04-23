@@ -38,16 +38,35 @@ func CreateGameHistory() *GameHistory {
 func (h *GameHistory) Run(event GameEvent) *GameState {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
-	return h.run(event)
+	return h.run(event.Time(), event)
 }
 
-func (h *GameHistory) run(event GameEvent) *GameState {
+func (h *GameHistory) Tick() *GameState {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.run(MakeTimestamp(), nil)
+}
+
+func (h *GameHistory) GetCurrentStateAndClean() *GameState {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// save state
+	state := h.currentState()
+
+	// run dead object cleanup
+	now := MakeTimestamp()
+	h.run(now, &CleanupEvent{now})
+
+	return state
+}
+
+func (h *GameHistory) run(t uint64, event GameEvent) *GameState {
 	// find the closest prior entry to inject after
-	previousEl := h.closestPriorHistoryEntry(event.Time())
+	previousEl := h.closestPriorHistoryEntry(t)
 
 	// inject the new entry
-	el := h.events.InsertAfter(&GameHistoryEntry{event.Time(), nil, event}, previousEl)
+	el := h.events.InsertAfter(&GameHistoryEntry{t, nil, event}, previousEl)
 
 	// re-write history from the element forward
 	for el != nil {
@@ -69,34 +88,6 @@ func (h *GameHistory) run(event GameEvent) *GameState {
 
 	h.trim()
 	return h.currentState()
-}
-
-func (h *GameHistory) Tick() error {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	// get last game state
-	oldState := h.currentState()
-
-	// update game state
-	now := MakeTimestamp()
-	newState := oldState.Tick(now)
-	h.events.PushBack(&GameHistoryEntry{now, newState, nil})
-	h.trim()
-	return nil
-}
-
-func (h *GameHistory) GetCurrentStateAndClean() *GameState {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	// save state
-	state := h.currentState()
-
-	// run dead object cleanup
-	h.run(&CleanupEvent{MakeTimestamp()})
-
-	return state
 }
 
 func (h *GameHistory) currentEntry() *GameHistoryEntry {
