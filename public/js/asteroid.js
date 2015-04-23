@@ -12,7 +12,6 @@ var Asteroid = function(game, settings) {
     this[i] = settings[i];
   }
 
-  this.boundingBox = this.c.collider.CIRCLE;
   this.size = { x: 10, y: 10 };
   this.zindex = -1;
   this.center = this.position;

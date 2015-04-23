@@ -8,7 +8,6 @@ var Projectile = function(game, settings) {
   this.game = game;
   this.c = game.c;
   this.conn = game.conn;
-  this.boundingBox = this.c.collider.CIRCLE;
   this.size = { x: 3, y: 3 };
   this.zindex = -1;
   this.created = this.conn.now();
