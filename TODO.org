@@ -7,14 +7,15 @@
 * TODO Move stars server side
 * TODO More star variety/constellations
 * TODO Update diffs
-* TODO Collision detection
+* DONE Servir-side collision detection
+* TODO Client-side collision detection
 * TODO Missiles hitting things
 * TODO Health
 * TODO Asteroids splitting (predetermined chunk sizes and ids?)
-* TODO Client disconnect -> death/disappear
+* DONE Client disconnect -> death/disappear
 * TODO Better ids for projectiles
 * TODO Large game map, viewports with smart data sync
-* TODO Prediction, interpolation, lag compensation, etc
+* DONE Prediction, interpolation, lag compensation, etc
 * TODO Profiling/benchmarking
 * TODO Health bars
 * TODO Death detection
@@ -22,5 +23,6 @@
 * TODO Death animation
 * TODO Spawn animation
 * TODO Minimap/radar and/or arrows indication direction to off-screen enemies
-* TODO Use gopherjs (https://github.com/gopherjs/gopherjs) to sync game object construct and simulation logic?
-* TODO JSON stringify update message before sending to each client
+* DONE Use gopherjs (https://github.com/gopherjs/gopherjs) to sync game object construct and simulation logic? (not doing it)
+* DONE JSON stringify update message before sending to each client (not doing it -- now we have last event id)
+* TODO Wrap-around map? (probably won't have time for view-ports)
