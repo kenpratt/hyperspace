@@ -62,6 +62,10 @@ func (c *Client) run() {
 
 func (c *Client) handleMessage(message *Message) {
 	switch message.Type {
+	case "h":
+		// received heartbeat, that means we should send an update
+		state := game.history.CurrentState()
+		c.SendUpdate(state)
 	case "changeAcceleration":
 		var data AccelerationData
 		err := json.Unmarshal([]byte(*message.Data), &data)

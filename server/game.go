@@ -47,8 +47,7 @@ func (e GameError) Error() string {
 }
 
 const (
-	gameUpdatePeriod   = 10 * time.Millisecond
-	clientUpdatePeriod = 100 * time.Millisecond
+	gameUpdatePeriod = 10 * time.Millisecond
 )
 
 // TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
@@ -84,10 +83,8 @@ func CreateGame() *Game {
 
 func (g *Game) Run() {
 	gameUpdateTicker := time.NewTicker(gameUpdatePeriod)
-	clientUpdateTicker := time.NewTicker(clientUpdatePeriod)
 	defer func() {
 		gameUpdateTicker.Stop()
-		clientUpdateTicker.Stop()
 	}()
 
 	for {
@@ -108,9 +105,6 @@ func (g *Game) Run() {
 			}
 		case <-gameUpdateTicker.C:
 			g.history.Tick()
-		case <-clientUpdateTicker.C:
-			state := g.history.GetCurrentStateAndClean()
-			g.broadcastUpdate(state)
 		}
 	}
 }

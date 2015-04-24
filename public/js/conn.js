@@ -2,9 +2,10 @@ var ServerConnection = function(url, params) {
   this.url = url;
   this.params = params;
   this.socket = null;
-  this.handlers = { h: this.onHeartbeat.bind(this) };
+  this.handlers = {};
   this.nextHeartbeat = null;
   this.heartbeatSentAt = null;
+  this.heartbeatReceivedAt = null;
   this.latencySMA = utils.simpleMovingAverage(10);
   this.latency = 0;
   this.clockDiff = 0;
@@ -30,17 +31,31 @@ ServerConnection.prototype.onDisconnect = function() {
 };
 
 ServerConnection.prototype.onMessage = function(ev) {
-  var raw = JSON.parse(ev.data);
-  var type = raw.type;
-  var data = raw.data;
-  var time = raw.time;
-  // console.log("websocket received message", type, data, time);
+  var msg = JSON.parse(ev.data);
+  if (this.params.latency) {
+    setTimeout(function() {
+      this.handleMessage(msg);
+    }.bind(this), this.params.latency / 2);
+  } else {
+    this.handleMessage(msg);
+  }
+};
 
-  var fn = this.handlers[type];
-  if (fn) {
-    if (this.params.latency) {
-      setTimeout(function() { fn(data, time); }, this.params.latency / 2);
-    } else {
+ServerConnection.prototype.handleMessage = function(msg) {
+  var type = msg.type;
+  var data = msg.data;
+  var time = msg.time;
+
+  switch (type) {
+  case "h":
+    this.onHeartbeat(data, time);
+    break;
+  case "update":
+    this.onUpdate(data, time);
+    // *don't* break -- fall through to default
+  default:
+    var fn = this.handlers[type];
+    if (fn) {
       fn(data, time);
     }
   }
@@ -72,13 +87,24 @@ ServerConnection.prototype.sendHeartbeat = function() {
 ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
   var now = Date.now();
   var elapsed = now - this.heartbeatSentAt;
+  this.heartbeatReceivedAt = now;
 
   // update latency & estimated client/server clock difference
   this.clockDiff = now - Math.round(elapsed/2) - serverTime;
   this.latency = Math.round(this.latencySMA(elapsed));
 
-  // schedule next heartbeat
-  this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), 100);
+  console.log("heartbeat: took " + elapsed + "ms, clockDiff: " + this.clockDiff + "ms, latency: " + this.latency + "ms");
+};
+
+ServerConnection.prototype.onUpdate = function(data, serverTime) {
+  var now = Date.now();
+  var elapsedSinceHeartbeatSent = now - this.heartbeatSentAt;
+  var elapsedSinceHeartbeatReceived = now - this.heartbeatReceivedAt;
+
+  console.log("update: took " + elapsedSinceHeartbeatReceived + "ms");
+
+  // schedule next heartbeat for (100ms - time since last heartbeat sent)
+  this.nextHeartbeat = setTimeout(this.sendHeartbeat.bind(this), Math.max(100 - elapsedSinceHeartbeatSent, 0));
 };
 
 ServerConnection.prototype.now = function() {

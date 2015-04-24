@@ -47,6 +47,15 @@ func (h *GameHistory) Tick() *GameState {
 	return h.run(MakeTimestamp(), nil)
 }
 
+func (h *GameHistory) CurrentState() *GameState {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// return current state
+	return h.currentState()
+}
+
+// TODO: This method is no longer called. Need to re-enable cleanup.
 func (h *GameHistory) GetCurrentStateAndClean() *GameState {
 	h.mu.Lock()
 	defer h.mu.Unlock()
