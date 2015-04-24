@@ -11,6 +11,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
       right: false,
     },
     lastEventId: 0,
+    lastProjectileId: 0,
 
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
@@ -59,7 +60,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
       // Fire the lasers! Say Pew Pew Pew every time you press the space bar
       // please.
       if (this.c.inputter.isPressed(this.c.inputter.SPACE)) {
-        var projectileId = this.id + "." + this.conn.now();
+        var projectileId = this.nextProjectileId();
 
         if (this.game.clientUpdatesEnabled) {
           var projectile = this.game.addProjectile({
@@ -89,6 +90,10 @@ Hyperspace.prototype.addOwnShip = function(data) {
       var eventId = ++this.lastEventId;
       data.eventId = eventId;
       this.conn.send(type, data);
+    },
+    nextProjectileId: function() {
+      this.lastProjectileId++;
+      return this.id + "." + this.lastProjectileId;
     },
   };
   for (k in extra) { data[k] = extra[k]; }
