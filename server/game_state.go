@@ -3,10 +3,10 @@ package main
 import "log"
 
 type GameState struct {
-	Time        uint64                 `json:"time"`
-	Ships       map[string]*Ship       `json:"ships"`
-	Projectiles map[string]*Projectile `json:"projectiles"`
-	Asteroids   map[string]*Asteroid   `json:"asteroids"`
+	Time        uint64                 `bson:"time"`
+	Ships       map[string]*Ship       `bson:"ships"`
+	Projectiles map[string]*Projectile `bson:"projectiles"`
+	Asteroids   map[string]*Asteroid   `bson:"asteroids"`
 }
 
 func CreateGameState(t uint64) *GameState {

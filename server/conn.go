@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -75,7 +76,11 @@ func (c *Connection) write(mt int, payload []byte) error {
 // write a JSON message.
 func (c *Connection) writeJSON(message interface{}) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
-	return c.ws.WriteJSON(message)
+	data, err := bson.Marshal(message)
+	if err != nil {
+		panic(err)
+	}
+	return c.ws.WriteMessage(websocket.BinaryMessage, data)
 }
 
 // writePump pumps messages from the hub to the websocket connection.

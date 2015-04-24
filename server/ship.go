@@ -3,12 +3,12 @@ package main
 import "math"
 
 type Ship struct {
-	Id           string  `json:"i"`
-	Alive        bool    `json:"z"`
-	Position     *Point  `json:"p"`
-	Angle        float64 `json:"a"`
-	Acceleration int8    `json:"l"`
-	Rotation     int8    `json:"r"`
+	Id           string  `bson:"i"`
+	Alive        bool    `bson:"z"`
+	Position     *Point  `bson:"p"`
+	Angle        float64 `bson:"a"`
+	Acceleration int8    `bson:"l"`
+	Rotation     int8    `bson:"r"`
 }
 
 const (

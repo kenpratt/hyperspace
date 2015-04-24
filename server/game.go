@@ -34,9 +34,9 @@ type GameSettings struct {
 }
 
 type GameConstants struct {
-	ShipAcceleration uint16 `json:"ship_acceleration"`
-	ShipRotation     uint16 `json:"ship_rotation"`
-	ProjectileSpeed  uint16 `json:"projectile_speed"`
+	ShipAcceleration uint16 `bson:"ship_acceleration"`
+	ShipRotation     uint16 `bson:"ship_rotation"`
+	ProjectileSpeed  uint16 `bson:"projectile_speed"`
 }
 
 type GameError struct {

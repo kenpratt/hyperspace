@@ -12,6 +12,7 @@ var ServerConnection = function(url, params) {
 
 ServerConnection.prototype.connect = function() {
   this.socket = new WebSocket(this.url);
+  this.socket.binaryType = "arraybuffer";
   this.socket.onopen = this.onConnect.bind(this);
   this.socket.onclose = this.onDisconnect.bind(this);
   this.socket.onmessage = this.onMessage.bind(this);
@@ -30,7 +31,8 @@ ServerConnection.prototype.onDisconnect = function() {
 };
 
 ServerConnection.prototype.onMessage = function(ev) {
-  var msg = JSON.parse(ev.data);
+  // var msg = JSON.parse(ev.data);
+  var msg = bson.BSON.deserialize(new Uint8Array(ev.data));
   if (this.params.latency) {
     setTimeout(function() {
       this.handleMessage(msg);

@@ -1,12 +1,12 @@
 package main
 
 type Asteroid struct {
-	Id       string   `json:"i"`
-	Alive    bool     `json:"z"`
-	Position *Point   `json:"p"`
-	Angle    float64  `json:"a"`
-	Velocity *Vector  `json:"v"`
-	Shape    []*Point `json:"s"`
+	Id       string   `bson:"i"`
+	Alive    bool     `bson:"z"`
+	Position *Point   `bson:"p"`
+	Angle    float64  `bson:"a"`
+	Velocity *Vector  `bson:"v"`
+	Shape    []*Point `bson:"s"`
 }
 
 func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {

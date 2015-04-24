@@ -1,13 +1,13 @@
 package main
 
 type Projectile struct {
-	Id       string  `json:"i"`
-	Alive    bool    `json:"z"`
-	Position *Point  `json:"p"`
-	Velocity *Vector `json:"v"`
-	Created  uint64  `json:"c"`
-	Owner    string  `json:"o"`
-	Died     uint64  `json:"-"`
+	Id       string  `bson:"i"`
+	Alive    bool    `bson:"z"`
+	Position *Point  `bson:"p"`
+	Velocity *Vector `bson:"v"`
+	Created  uint64  `bson:"c"`
+	Owner    string  `bson:"o"`
+	Died     uint64  `bson:"-"`
 }
 
 const (

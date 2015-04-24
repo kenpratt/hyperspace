@@ -7,13 +7,13 @@ import (
 )
 
 type Point struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	X float64 `bson:"x"`
+	Y float64 `bson:"y"`
 }
 
 type Vector struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+	X float64 `bson:"x"`
+	Y float64 `bson:"y"`
 }
 
 func MakePoint(x float64, y float64) *Point {
