@@ -49,7 +49,7 @@ var utils = {
       y: vector.y * a,
     };
   },
-  simpleMovingAverage: function(period) {
+  simpleMovingAverage: function(period, toDiscard) {
     var nums = new Array(period);
     for (var i = 0; i < period; i++) {
       nums[i] = 0;
@@ -61,7 +61,7 @@ var utils = {
       sum -= nums[idx]; // subtract last value
       nums[idx] = num; // record new value
       sum += num; // add new value
-      length++; // update length
+      if (length < period) { length++ }; // update length
 
       // advance pointer
       idx++;
@@ -69,8 +69,19 @@ var utils = {
         idx = 0;
       }
 
-      // return result
-      return sum / (length < period ? length : period);
+      if (toDiscard > 0) {
+        // discard the lowest and highest results in the set
+        var sorted = nums.slice(0, length).sort();
+        var n = Math.floor(toDiscard * length);
+        var msum = 0;
+        for (var i = n; i < (length - n); i++) {
+          msum += sorted[i];
+        }
+        return msum / (length - n - n);
+      } else {
+        // return simple mean as result
+        return sum / length;
+      }
     }
   },
   roundToPlaces: function(f, places) {

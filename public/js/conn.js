@@ -7,6 +7,7 @@ var ServerConnection = function(url, params) {
   this.heartbeatSentAt = null;
   this.heartbeatReceivedAt = null;
   this.latencySMA = utils.simpleMovingAverage(10);
+  this.clockDiffSMA = utils.simpleMovingAverage(100, 0.1);
   this.latency = 0;
   this.clockDiff = 0;
 };
@@ -90,7 +91,7 @@ ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
   this.heartbeatReceivedAt = now;
 
   // update latency & estimated client/server clock difference
-  this.clockDiff = now - Math.round(elapsed/2) - serverTime;
+  this.clockDiff = Math.round(this.clockDiffSMA(now - Math.round(elapsed/2) - serverTime));
   this.latency = Math.round(this.latencySMA(elapsed));
 
   console.log("heartbeat: took " + elapsed + "ms, clockDiff: " + this.clockDiff + "ms, latency: " + this.latency + "ms");
