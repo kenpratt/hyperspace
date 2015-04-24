@@ -104,18 +104,11 @@ func (g *Game) Run() {
 				delete(g.clients, c)
 			}
 		case <-gameUpdateTicker.C:
-			g.history.Tick()
+			state := g.history.Tick()
+			if settings.debug {
+				log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
+			}
 		}
-	}
-}
-
-func (g *Game) broadcastUpdate(state *GameState) {
-	if settings.debug {
-		log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
-	}
-
-	for c := range g.clients {
-		c.SendUpdate(state)
 	}
 }
 
