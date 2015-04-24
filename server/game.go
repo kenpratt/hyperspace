@@ -73,7 +73,7 @@ func CreateGame() *Game {
 	}
 
 	// Create asteroids
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000; i++ {
 		id := g.generateId()
 		p, a, v, s := RandomAsteroidGeometry()
 		g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, p, a, v, s})
@@ -95,8 +95,12 @@ func (g *Game) Run() {
 			g.clients[c] = true
 
 			// Create ship
-			id := g.generateId()
-			state := g.history.Run(&CreateShipEvent{MakeTimestamp(), id, MakePoint(0, 0)})
+			var id string
+			var state *GameState
+			for i := 0; i < 20; i++ {
+				id = g.generateId()
+				state = g.history.Run(&CreateShipEvent{MakeTimestamp(), id, MakePoint(0, 0)})
+			}
 
 			// Send game state dump to player
 			c.Initialize(id, settings.constants, state)

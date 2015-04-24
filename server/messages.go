@@ -12,13 +12,17 @@ type Message struct {
 	Data *json.RawMessage `json:"data"`
 }
 
-type InitData struct {
+type InitMessage struct {
+	Type      string         `json:"type"`
+	Time      uint64         `json:"time"`
 	PlayerId  string         `json:"playerId"`
 	Constants *GameConstants `json:"constants"`
 	State     *GameState     `json:"state"`
 }
 
-type UpdateData struct {
+type UpdateMessage struct {
+	Type        string     `json:"type"`
+	Time        uint64     `json:"time"`
 	State       *GameState `json:"state"`
 	LastEventId uint64     `json:"lastEvent"`
 }

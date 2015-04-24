@@ -40,7 +40,7 @@ type Connection struct {
 
 	// Buffered channels of inbound and outbound messages.
 	receive chan *Message
-	send    chan *Message
+	send    chan interface{}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -73,7 +73,7 @@ func (c *Connection) write(mt int, payload []byte) error {
 }
 
 // write a JSON message.
-func (c *Connection) writeJSON(message *Message) error {
+func (c *Connection) writeJSON(message interface{}) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.ws.WriteJSON(message)
 }
@@ -117,7 +117,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	c := &Connection{ws, make(chan *Message, 256), make(chan *Message, 256)}
+	c := &Connection{ws, make(chan *Message, 256), make(chan interface{}, 256)}
 	makeClient(c)
 	go c.writePump()
 	c.readPump()

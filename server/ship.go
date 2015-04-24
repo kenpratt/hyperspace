@@ -1,10 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"math"
-)
+import "math"
 
 type Ship struct {
 	Id           string  `json:"i"`
@@ -66,7 +62,7 @@ func (s *Ship) Tick(t uint64, state *GameState) *Ship {
 
 			if distance < ShipRadius*2 {
 				if settings.debug {
-					log.Println(fmt.Sprintf("Ship %v colliding with Ship %v", s.Id, os.Id))
+					// log.Println(fmt.Sprintf("Ship %v colliding with Ship %v", s.Id, os.Id))
 				}
 			}
 		}
@@ -79,7 +75,7 @@ func (s *Ship) Tick(t uint64, state *GameState) *Ship {
 
 		if distance < ShipRadius+ProjectileRadius {
 			if settings.debug {
-				log.Println(fmt.Sprintf("Ship %v colliding with Projectile %v", s.Id, p.Id))
+				// log.Println(fmt.Sprintf("Ship %v colliding with Projectile %v", s.Id, p.Id))
 			}
 		}
 	}

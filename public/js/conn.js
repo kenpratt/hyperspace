@@ -42,7 +42,7 @@ ServerConnection.prototype.onMessage = function(ev) {
 
 ServerConnection.prototype.handleMessage = function(msg) {
   var type = msg.type;
-  var data = msg.data;
+  var data = msg;
   var time = msg.time;
 
   switch (type) {
@@ -61,6 +61,7 @@ ServerConnection.prototype.handleMessage = function(msg) {
 };
 
 ServerConnection.prototype.send = function(type, data) {
+  return;
   var msg = JSON.stringify({ type: type, time: this.now(), data: data });
   if (this.socket.readyState === this.socket.OPEN) {
     // console.log("websocket sending message", type, data);

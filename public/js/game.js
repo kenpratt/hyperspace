@@ -42,12 +42,12 @@ var Hyperspace = function(params) {
   this.conn.handle("init", function(data) {
     this.playerId = data.playerId;
     this.constants = data.constants;
-    this.handleUpdate(data);
+    // this.handleUpdate(data);
   }.bind(this));
 
   this.conn.handle("update", function(data) {
     if (this.serverUpdatesEnabled) {
-      this.handleUpdate(data);
+      // this.handleUpdate(data);
     }
   }.bind(this));
 };

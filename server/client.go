@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 // A Client is a connected player and associated websocket connection.
@@ -33,12 +34,7 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	c.playerId = playerId
 
 	// send initial player data to client
-	b, err := json.Marshal(&InitData{playerId, gameConstants, gameState})
-	if err != nil {
-		panic(err)
-	}
-	raw := json.RawMessage(b)
-	c.Send(&Message{Type: "init", Time: MakeTimestamp(), Data: &raw})
+	c.Send(&InitMessage{Type: "init", Time: MakeTimestamp(), PlayerId: playerId, Constants: gameConstants, State: gameState})
 
 	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
 
@@ -50,13 +46,19 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 }
 
 func (c *Client) run() {
+	updateTicker := time.NewTicker(100 * time.Millisecond)
 	defer func() {
+		updateTicker.Stop()
 		game.unregister <- c
 		close(c.conn.send)
 	}()
 
 	for {
 		select {
+		case <-updateTicker.C:
+			now := MakeTimestamp()
+			state := game.history.Run(&FireEvent{now, c.playerId, game.generateId(), now})
+			c.SendUpdate(state)
 		case message, ok := <-c.conn.receive:
 			if !ok {
 				log.Println(fmt.Sprintf("Client Stopping: %v", c.playerId))
@@ -111,19 +113,13 @@ func (c *Client) updateLastAppliedEvent(eventId uint64) {
 }
 
 func (c *Client) SendUpdate(state *GameState) {
-	b, err := json.Marshal(&UpdateData{state, c.lastAppliedEventId})
-	if err != nil {
-		panic(err)
-	}
-
-	raw := json.RawMessage(b)
-	c.Send(&Message{Type: "update", Time: MakeTimestamp(), Data: &raw})
+	c.Send(&UpdateMessage{Type: "update", Time: MakeTimestamp(), State: state, LastEventId: c.lastAppliedEventId})
 
 	// update last seen game state
 	c.setLastUpdateTime(state.Time)
 }
 
-func (c *Client) Send(message *Message) {
+func (c *Client) Send(message interface{}) {
 	c.conn.send <- message
 }
 
