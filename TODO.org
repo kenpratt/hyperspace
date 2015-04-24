@@ -27,6 +27,6 @@
 * DONE JSON stringify update message before sending to each client (not doing it -- now we have last event id)
 * TODO Wrap-around map? (probably won't have time for view-ports)
 * DONE Try new heartbeat-request-update model
-* TODO Use SMA for clock diff
+* DONE Use SMA for clock diff
 * TODO Compare msgpack, LZW encoding, protobuf (create some sample data with a few ships, a bunch of projectiles & asteroids)
-* TODO Fix deletion of dead objects -- either auto-delete after X seconds, or track last-synced timestamp of each connected client, and maintain a "low water mark" in game, pass that into history on tick so it knows what it can cull
+* DONE Fix deletion of dead objects -- either auto-delete after X seconds, or track last-synced timestamp of each connected client, and maintain a "low water mark" in game, pass that into history on tick so it knows what it can cull

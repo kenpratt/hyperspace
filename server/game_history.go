@@ -41,10 +41,11 @@ func (h *GameHistory) Run(event GameEvent) *GameState {
 	return h.run(event.Time(), event)
 }
 
-func (h *GameHistory) Tick() *GameState {
+func (h *GameHistory) Tick(syncedUntil uint64) *GameState {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	return h.run(MakeTimestamp(), nil)
+	now := MakeTimestamp()
+	return h.run(now, &TickEvent{now, syncedUntil})
 }
 
 func (h *GameHistory) CurrentState() *GameState {
@@ -53,21 +54,6 @@ func (h *GameHistory) CurrentState() *GameState {
 
 	// return current state
 	return h.currentState()
-}
-
-// TODO: This method is no longer called. Need to re-enable cleanup.
-func (h *GameHistory) GetCurrentStateAndClean() *GameState {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	// save state
-	state := h.currentState()
-
-	// run dead object cleanup
-	now := MakeTimestamp()
-	h.run(now, &CleanupEvent{now})
-
-	return state
 }
 
 func (h *GameHistory) run(t uint64, event GameEvent) *GameState {
@@ -85,11 +71,8 @@ func (h *GameHistory) run(t uint64, event GameEvent) *GameState {
 		// play physics from previous state to time of current el (immutable update, returns new state)
 		curr.state = prev.state.Tick(curr.time)
 
-		// apply current event, if defined
-		if curr.event != nil {
-			// execute the event code (mutable update on state passed in)
-			curr.event.Execute(curr.state)
-		}
+		// execute the event code (mutable update on state passed in)
+		curr.event.Execute(curr.state)
 
 		// proceed to next element
 		el = el.Next()

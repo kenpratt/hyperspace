@@ -102,7 +102,7 @@ type FireEvent struct {
 	time         uint64
 	shipId       string
 	projectileId string
-	Created      uint64
+	created      uint64
 }
 
 func (e *FireEvent) Time() uint64 {
@@ -116,32 +116,27 @@ func (e *FireEvent) Execute(state *GameState) error {
 	}
 
 	pos := *s.Position // Clone ship position
-	projectile := CreateProjectile(e.projectileId, &pos, s.Angle, e.Created, e.shipId)
+	projectile := CreateProjectile(e.projectileId, &pos, s.Angle, e.created, e.shipId)
 	state.Projectiles[projectile.Id] = projectile
 	return nil
 }
 
-// remove dead objects
-type CleanupEvent struct {
-	time uint64
+// game tick event
+type TickEvent struct {
+	time        uint64
+	syncedUntil uint64
 }
 
-func (e *CleanupEvent) Time() uint64 {
+func (e *TickEvent) Time() uint64 {
 	return e.time
 }
 
-func (e *CleanupEvent) Execute(state *GameState) error {
-	dead := []string{}
-
-	for k, v := range state.Projectiles {
-		if !v.Alive {
-			dead = append(dead, k)
+func (e *TickEvent) Execute(state *GameState) error {
+	// delete projectiles that died long enough ago that all clients have seen their dead status
+	for id, p := range state.Projectiles {
+		if !p.Alive && p.Died <= e.syncedUntil {
+			delete(state.Projectiles, id)
 		}
 	}
-
-	for i := range dead {
-		delete(state.Projectiles, dead[i])
-	}
-
 	return nil
 }

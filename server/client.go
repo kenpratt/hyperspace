@@ -16,6 +16,9 @@ type Client struct {
 
 	// ID of the last applied event
 	lastAppliedEventId uint64
+
+	// Time of last sent game state
+	lastUpdateTime uint64
 }
 
 func makeClient(conn *Connection) *Client {
@@ -36,6 +39,9 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	c.Send(&Message{Type: "init", Time: MakeTimestamp(), Data: &raw})
 
 	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
+
+	// update last seen game state
+	c.lastUpdateTime = gameState.Time
 
 	// boot client message handler
 	go c.run()
@@ -110,6 +116,9 @@ func (c *Client) SendUpdate(state *GameState) {
 
 	raw := json.RawMessage(b)
 	c.Send(&Message{Type: "update", Time: MakeTimestamp(), Data: &raw})
+
+	// update last seen game state
+	c.lastUpdateTime = state.Time
 }
 
 func (c *Client) Send(message *Message) {

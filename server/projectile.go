@@ -7,6 +7,7 @@ type Projectile struct {
 	Velocity *Vector `json:"v"`
 	Created  uint64  `json:"c"`
 	Owner    string  `json:"o"`
+	Died     uint64  `json:"-"`
 }
 
 const (
@@ -35,11 +36,13 @@ func (p *Projectile) Tick(t uint64, state *GameState) *Projectile {
 
 	// calculate new aliveness
 	alive := p.Alive
+	died := p.Died
 	if alive && (t-p.Created) >= 2000 {
 		alive = false
+		died = t
 	}
 
-	// return copy of object with new position
+	// return copy of object with new position and alive status
 	return &Projectile{
 		Id:       p.Id,
 		Alive:    alive,
@@ -47,5 +50,6 @@ func (p *Projectile) Tick(t uint64, state *GameState) *Projectile {
 		Velocity: p.Velocity,
 		Created:  p.Created,
 		Owner:    p.Owner,
+		Died:     died,
 	}
 }
