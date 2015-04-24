@@ -60,8 +60,7 @@ func (c *Connection) readPump() {
 		}
 		if message.Type == "h" {
 			// respond to heartbeat right away, but still send it to the client as well
-			response := &Message{Type: "h", Time: MakeTimestamp()}
-			c.writeJSON(response)
+			c.send <- &Message{Type: "h", Time: MakeTimestamp()}
 		}
 		c.receive <- &message
 	}
