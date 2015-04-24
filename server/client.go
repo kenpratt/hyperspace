@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 )
 
 // A Client is a connected player and associated websocket connection.
@@ -18,7 +19,8 @@ type Client struct {
 	lastAppliedEventId uint64
 
 	// Time of last sent game state
-	lastUpdateTime uint64
+	lastUpdateTime   uint64
+	lastUpdateTimeMu sync.Mutex
 }
 
 func makeClient(conn *Connection) *Client {
@@ -41,7 +43,7 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
 
 	// update last seen game state
-	c.lastUpdateTime = gameState.Time
+	c.setLastUpdateTime(gameState.Time)
 
 	// boot client message handler
 	go c.run()
@@ -118,9 +120,21 @@ func (c *Client) SendUpdate(state *GameState) {
 	c.Send(&Message{Type: "update", Time: MakeTimestamp(), Data: &raw})
 
 	// update last seen game state
-	c.lastUpdateTime = state.Time
+	c.setLastUpdateTime(state.Time)
 }
 
 func (c *Client) Send(message *Message) {
 	c.conn.send <- message
+}
+
+func (c *Client) setLastUpdateTime(t uint64) {
+	c.lastUpdateTimeMu.Lock()
+	defer c.lastUpdateTimeMu.Unlock()
+	c.lastUpdateTime = t
+}
+
+func (c *Client) LastUpdateTime() uint64 {
+	c.lastUpdateTimeMu.Lock()
+	defer c.lastUpdateTimeMu.Unlock()
+	return c.lastUpdateTime
 }

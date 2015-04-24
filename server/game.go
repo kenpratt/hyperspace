@@ -121,8 +121,9 @@ func (g *Game) generateId() string {
 func (g *Game) lowestSeenUpdateTime() uint64 {
 	var lowest uint64 = math.MaxUint64
 	for c, _ := range g.clients {
-		if c.lastUpdateTime < lowest {
-			lowest = c.lastUpdateTime
+		t := c.LastUpdateTime()
+		if t < lowest {
+			lowest = t
 		}
 	}
 	return lowest
