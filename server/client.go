@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"sync"
@@ -34,7 +33,12 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	c.playerId = playerId
 
 	// send initial player data to client
-	c.Send(&InitMessage{Type: "init", Time: MakeTimestamp(), PlayerId: playerId, Constants: gameConstants, State: gameState})
+	m := &InitMessage{Type: "init", Time: MakeTimestamp(), PlayerId: playerId, Constants: gameConstants, State: gameState}
+	res, err := m.MarshalMsg(nil)
+	if err != nil {
+		panic(err)
+	}
+	c.Send(res)
 
 	log.Println(fmt.Sprintf("Client Starting: %v", c.playerId))
 
@@ -76,30 +80,30 @@ func (c *Client) handleMessage(message *Message) {
 		// received heartbeat, that means we should send an update
 		state := game.history.CurrentState()
 		c.SendUpdate(state)
-	case "changeAcceleration":
-		var data AccelerationData
-		err := json.Unmarshal([]byte(*message.Data), &data)
-		if err != nil {
-			log.Fatal(err)
-		}
-		game.history.Run(&ChangeAccelerationEvent{message.Time, c.playerId, data.Direction})
-		c.updateLastAppliedEvent(data.EventId)
-	case "changeRotation":
-		var data RotationData
-		err := json.Unmarshal([]byte(*message.Data), &data)
-		if err != nil {
-			log.Fatal(err)
-		}
-		game.history.Run(&ChangeRotationEvent{message.Time, c.playerId, data.Direction})
-		c.updateLastAppliedEvent(data.EventId)
-	case "fire":
-		var data FireData
-		err := json.Unmarshal([]byte(*message.Data), &data)
-		if err != nil {
-			log.Fatal(err)
-		}
-		game.history.Run(&FireEvent{message.Time, c.playerId, data.ProjectileId, data.Created})
-		c.updateLastAppliedEvent(data.EventId)
+		// case "changeAcceleration":
+		// 	var data AccelerationData
+		// 	err := json.Unmarshal([]byte(*message.Data), &data)
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// 	game.history.Run(&ChangeAccelerationEvent{message.Time, c.playerId, data.Direction})
+		// 	c.updateLastAppliedEvent(data.EventId)
+		// case "changeRotation":
+		// 	var data RotationData
+		// 	err := json.Unmarshal([]byte(*message.Data), &data)
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// 	game.history.Run(&ChangeRotationEvent{message.Time, c.playerId, data.Direction})
+		// 	c.updateLastAppliedEvent(data.EventId)
+		// case "fire":
+		// 	var data FireData
+		// 	err := json.Unmarshal([]byte(*message.Data), &data)
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// 	game.history.Run(&FireEvent{message.Time, c.playerId, data.ProjectileId, data.Created})
+		// 	c.updateLastAppliedEvent(data.EventId)
 	}
 
 }
@@ -113,13 +117,18 @@ func (c *Client) updateLastAppliedEvent(eventId uint64) {
 }
 
 func (c *Client) SendUpdate(state *GameState) {
-	c.Send(&UpdateMessage{Type: "update", Time: MakeTimestamp(), State: state, LastEventId: c.lastAppliedEventId})
+	m := &UpdateMessage{Type: "update", Time: MakeTimestamp(), State: state, LastEventId: c.lastAppliedEventId}
+	res, err := m.MarshalMsg(nil)
+	if err != nil {
+		panic(err)
+	}
+	c.Send(res)
 
 	// update last seen game state
 	c.setLastUpdateTime(state.Time)
 }
 
-func (c *Client) Send(message interface{}) {
+func (c *Client) Send(message []byte) {
 	c.conn.send <- message
 }
 

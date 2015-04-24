@@ -40,7 +40,7 @@ type Connection struct {
 
 	// Buffered channels of inbound and outbound messages.
 	receive chan *Message
-	send    chan interface{}
+	send    chan []byte
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -60,7 +60,12 @@ func (c *Connection) readPump() {
 		}
 		if message.Type == "h" {
 			// respond to heartbeat right away, but still send it to the client as well
-			c.send <- &Message{Type: "h", Time: MakeTimestamp()}
+			m := &Message{Type: "h", Time: MakeTimestamp()}
+			res, err := m.MarshalMsg(nil)
+			if err != nil {
+				panic(err)
+			}
+			c.send <- res
 		}
 		c.receive <- &message
 	}
@@ -73,9 +78,9 @@ func (c *Connection) write(mt int, payload []byte) error {
 }
 
 // write a JSON message.
-func (c *Connection) writeJSON(message interface{}) error {
+func (c *Connection) writeJSON(message []byte) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
-	return c.ws.WriteJSON(message)
+	return c.ws.WriteMessage(websocket.BinaryMessage, message)
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -117,7 +122,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	c := &Connection{ws, make(chan *Message, 256), make(chan interface{}, 256)}
+	c := &Connection{ws, make(chan *Message, 256), make(chan []byte, 256)}
 	makeClient(c)
 	go c.writePump()
 	c.readPump()
