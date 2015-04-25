@@ -58,11 +58,11 @@ var settings = &GameSettings{
 
 	// Game constants, values are all per-second
 	constants: &GameConstants{
-		ShipRadius:       10,   // Pixels
+		ShipRadius:       5.6,  // Pixels
 		ShipAcceleration: 100,  // Pixels per second^2
 		ShipDrag:         -0.2, // Percentage reduction per second
 		ShipRotation:     200,  // Degrees per second
-		ProjectileRadius: 10,   // Pixels
+		ProjectileRadius: 3,    // Pixels
 		ProjectileSpeed:  180,  // Pixels per second
 	},
 }
