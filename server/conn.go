@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -53,15 +54,28 @@ func (c *Connection) readPump() {
 	c.ws.SetReadDeadline(time.Now().Add(pongWait))
 	c.ws.SetPongHandler(func(string) error { c.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		var message Message
-		err := c.ws.ReadJSON(&message)
+		// read raw message off the socket
+		_, raw, err := c.ws.ReadMessage()
 		if err != nil {
-			break
+			panic(err)
 		}
+
+		// uncompress LZW
+		uncompressed := LzwDecompress(string(raw))
+
+		// unmarshal JSON
+		var message Message
+		err = json.Unmarshal(uncompressed, &message)
+		if err != nil {
+			panic(err)
+		}
+
+		// process the message
 		if message.Type == "h" {
 			// respond to heartbeat right away, but still send it to the client as well
 			c.send <- &Message{Type: "h", Time: MakeTimestamp()}
 		}
+
 		c.receive <- &message
 	}
 }
@@ -73,9 +87,20 @@ func (c *Connection) write(mt int, payload []byte) error {
 }
 
 // write a JSON message.
-func (c *Connection) writeJSON(message *Message) error {
+func (c *Connection) writeMessage(message *Message) error {
 	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
-	return c.ws.WriteJSON(message)
+
+	// marshal to JSON
+	str, err := json.Marshal(message)
+	if err != nil {
+		panic(err)
+	}
+
+	// compress with LZW
+	compressed := LzwCompress(str)
+
+	// send
+	return c.ws.WriteMessage(websocket.TextMessage, []byte(compressed))
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -93,7 +118,7 @@ func (c *Connection) writePump() {
 				return
 			}
 
-			if err := c.writeJSON(message); err != nil {
+			if err := c.writeMessage(message); err != nil {
 				log.Println("Error sending message:", err)
 				return
 			}

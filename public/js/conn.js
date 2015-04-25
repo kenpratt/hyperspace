@@ -30,7 +30,9 @@ ServerConnection.prototype.onDisconnect = function() {
 };
 
 ServerConnection.prototype.onMessage = function(ev) {
-  var msg = JSON.parse(ev.data);
+  var payload = ev.data;
+  var msg = JSON.parse(LZW.decode(payload));
+
   if (this.params.latency) {
     setTimeout(function() {
       this.handleMessage(msg);
@@ -61,7 +63,9 @@ ServerConnection.prototype.handleMessage = function(msg) {
 };
 
 ServerConnection.prototype.send = function(type, data) {
-  var msg = JSON.stringify({ type: type, time: this.now(), data: data });
+  var payload = { type: type, time: this.now(), data: data };
+  var msg = LZW.encode(JSON.stringify(payload));
+
   if (this.socket.readyState === this.socket.OPEN) {
     // console.log("websocket sending message", type, data);
     if (this.params.latency) {
