@@ -94,6 +94,23 @@ func (s *GameState) Tick(t uint64) *GameState {
 				p.Died = t
 			}
 		}
+
+		if !s.Alive {
+			continue
+		}
+
+		// check for ship-asteroid collisions
+		for _, a := range state.Asteroids {
+			if !s.Alive || !a.Alive {
+				continue
+			}
+
+			if IsColliding(s.Position, settings.constants.ShipRadius, a.Position, a.Radius) {
+				log.Println(fmt.Sprintf("Ship %v collided with Asteroid %v", s.Id, a.Id))
+				s.Alive = false
+				s.Died = t
+			}
+		}
 	}
 
 	return state
