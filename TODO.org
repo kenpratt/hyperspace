@@ -6,14 +6,14 @@
 * DONE Ship drift/velocity
 * TODO Move stars server side
 * TODO More star variety/constellations
-* TODO Update diffs
+* TODO Update diffs instead of full updates
 * DONE Server-side collision detection
 * TODO Client-side collision detection
 * TODO Missiles hitting things
 * TODO Health
 * TODO Asteroids splitting (predetermined chunk sizes and ids?)
 * DONE Client disconnect -> death/disappear
-* TODO Better ids for projectiles
+* DONE Better ids for projectiles
 * TODO Large game map, viewports with smart data sync
 * DONE Prediction, interpolation, lag compensation, etc
 * TODO Profiling/benchmarking
@@ -33,3 +33,13 @@
 * TODO Split collision detection into a separate step after all positions have been updated
 * DONE Add ship velocity to projectiles
 * TODO When position is incorrect, smooth it with a vector instead of jumping right there
+* TODO Replace panic and log.Fatal statements with error logs, so at least an error won't crash it
+* TODO Measure server timestamps as time since boot? (To make the numbers smaller and hence cut down on data)
+* TODO Smarter updates: if asterdoid created time <= last update, remove shape data and other non-changing info?
+
+Notes from arcade game:
+* Bullets are very bright, pulse, and leave both a bright trail and a slight trail , looking like shooting starts.
+* Ship has subtle flame in rear when accelerating, leaves subtle trail.
+* Alien spaceships that move around erratically trying to kill you.
+* Asteroids are more blocky, leave alpha trails.
+* Ship breaks apart into lines when killed.
