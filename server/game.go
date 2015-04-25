@@ -60,8 +60,8 @@ var settings = &GameSettings{
 	constants: &GameConstants{
 		ShipAcceleration: 100,  // Pixels per second^2
 		ShipDrag:         -0.2, // Percentage reduction per second
-		ShipRotation:     100,  // Degrees per second
-		ProjectileSpeed:  150,  // Pixels per second
+		ShipRotation:     200,  // Degrees per second
+		ProjectileSpeed:  180,  // Pixels per second
 	},
 }
 var game = CreateGame()
