@@ -113,5 +113,37 @@ func (s *GameState) Tick(t uint64) *GameState {
 		}
 	}
 
+	for _, a := range state.Asteroids {
+		if !a.Alive {
+			continue
+		}
+
+		// check for asteroid-projectile collisions
+		for _, p := range state.Projectiles {
+			if !a.Alive || !p.Alive {
+				continue
+			}
+
+			if IsColliding(a.Position, a.Radius, p.Position, settings.constants.ProjectileRadius) {
+				log.Println(fmt.Sprintf("Asteroid %v collided with Projectile %v", a.Id, p.Id))
+				// TODO: Asteroid should break apart
+				p.Alive = false
+				p.Died = t
+			}
+		}
+
+		// TODO: Asteroids should bounce off of each other
+		// check for asteroid-asteroid collisions
+		// for _, oa := range state.Asteroids {
+		// 	if !a.Alive || !oa.Alive || a.Id == oa.Id {
+		// 		continue
+		// 	}
+		//
+		// 	if IsColliding(a.Position, a.Radius, oa.Position, oa.Radius) {
+		// 		log.Println(fmt.Sprintf("Asteroid %v collided with Asteroid %v", a.Id, oa.Id))
+		// 	}
+		// }
+	}
+
 	return state
 }
