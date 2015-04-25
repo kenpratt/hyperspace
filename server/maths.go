@@ -82,6 +82,11 @@ func Random(min int, max int) int {
 	return min + rand.Intn(d)
 }
 
+func RandomFloat(min float64, max float64) float64 {
+	d := max - min + 1
+	return min + rand.Float64()*d
+}
+
 func RandomAngle() float64 {
 	return float64(Random(0, 359))
 }

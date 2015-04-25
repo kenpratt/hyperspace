@@ -11,8 +11,33 @@ type Asteroid struct {
 	Radius   float64  `json:"d"`
 }
 
-func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
-	sides := Random(6, 9)
+const (
+	Small = iota
+	Medium
+	Large
+)
+
+func RandomAsteroidShape(size int) []*Point {
+	var minSides, maxSides, targetCirumference int
+	switch size {
+	case Small:
+		minSides = 6
+		maxSides = 8
+		targetCirumference = 45
+	case Medium:
+		minSides = 6
+		maxSides = 9
+		targetCirumference = 90
+	case Large:
+		minSides = 7
+		maxSides = 10
+		targetCirumference = 160
+	}
+
+	sides := Random(minSides, maxSides)
+
+	minSideLength := float64(targetCirumference) / float64(sides) * 0.7
+	maxSideLength := float64(targetCirumference) / float64(sides) * 1.3
 
 	// randomly generate a shape
 	shape := make([]*Point, sides)
@@ -22,7 +47,7 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 	for i := 1; i < sides; i++ {
 		a := (360 - int(totalAngle)) / (sides - i + 1)
 		totalAngle += float64(Random(a-5, a+5))
-		l := Random(8, 15)
+		l := RandomFloat(minSideLength, maxSideLength)
 		v := AngleToVector(totalAngle)
 		c := MakePoint(last.X+v.X*float64(l), last.Y+v.Y*float64(l))
 		shape[i] = c
@@ -36,10 +61,14 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 		c.Y -= center.Y
 	}
 
+	return shape
+}
+
+func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 	return MakePoint(float64(Random(-1000, 1000)), float64(Random(-1000, 1000))),
 		RandomAngle(),
 		RoundVector(AngleAndSpeedToVector(RandomAngle(), float64(Random(10, 50)))),
-		shape
+		RandomAsteroidShape(Random(Small, Large))
 }
 
 func CreateAsteroid(id string, position *Point, angle float64, velocity *Vector, shape []*Point) *Asteroid {
