@@ -3,7 +3,7 @@
 * DONE Calculate actual elapsed time when doing physics, instead of fixed interval
 * TODO Ship colors - generate different colors for ships server side, sync in data
 * DONE Asteroids flying around (spawn with size and velocity -- for bonus points, make them spin)
-* TODO Ship drift/velocity
+* DONE Ship drift/velocity
 * TODO Move stars server side
 * TODO More star variety/constellations
 * TODO Update diffs
@@ -28,6 +28,7 @@
 * TODO Wrap-around map? (probably won't have time for view-ports)
 * DONE Try new heartbeat-request-update model
 * DONE Use SMA for clock diff
-* TODO Compare msgpack, LZW encoding, protobuf (create some sample data with a few ships, a bunch of projectiles & asteroids)
+* DONE Compare msgpack, LZW encoding, protobuf (create some sample data with a few ships, a bunch of projectiles & asteroids)
 * DONE Fix deletion of dead objects -- either auto-delete after X seconds, or track last-synced timestamp of each connected client, and maintain a "low water mark" in game, pass that into history on tick so it knows what it can cull
 * TODO Split collision detection into a separate step after all positions have been updated
+* TODO Add ship velocity to projectiles
