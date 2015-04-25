@@ -12,6 +12,8 @@ type Asteroid struct {
 
 func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 	sides := Random(6, 9)
+
+	// randomly generate a shape
 	shape := make([]*Point, sides)
 	shape[0] = MakePoint(0, 0)
 	last := shape[0]
@@ -24,6 +26,13 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 		c := MakePoint(last.X+v.X*float64(l), last.Y+v.Y*float64(l))
 		shape[i] = c
 		last = c
+	}
+
+	// find center by averaging points, and normalize points around center
+	center := CalculateCenter(shape)
+	for _, c := range shape {
+		c.X -= center.X
+		c.Y -= center.Y
 	}
 
 	return MakePoint(float64(Random(-1000, 1000)), float64(Random(-1000, 1000))),

@@ -86,9 +86,25 @@ func RandomAngle() float64 {
 	return float64(Random(0, 359))
 }
 
-func IsColliding(p1 *Point, r1 float64, p2 *Point, r2 float64) bool {
+func DistanceBetweenPoints(p1 *Point, p2 *Point) float64 {
 	dx := p1.X - p2.X
 	dy := p1.Y - p2.Y
-	distance := math.Sqrt(float64(dx*dx + dy*dy))
-	return distance < (r1 + r2)
+	return math.Sqrt(float64(dx*dx + dy*dy))
+}
+
+func CalculateCenter(points []*Point) *Point {
+	var sx float64 = 0
+	var sy float64 = 0
+	for _, p := range points {
+		sx += p.X
+		sy += p.Y
+	}
+	return &Point{
+		X: sx / float64(len(points)),
+		Y: sy / float64(len(points)),
+	}
+}
+
+func IsColliding(p1 *Point, r1 float64, p2 *Point, r2 float64) bool {
+	return DistanceBetweenPoints(p1, p2) < (r1 + r2)
 }
