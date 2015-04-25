@@ -8,6 +8,7 @@ type Asteroid struct {
 	Angle    float64  `json:"a"`
 	Velocity *Vector  `json:"v"`
 	Shape    []*Point `json:"s"`
+	Radius   float64  `json:"d"`
 }
 
 func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
@@ -41,15 +42,26 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 		shape
 }
 
-func CreateAsteroid(id string, p *Point, a float64, v *Vector, s []*Point) *Asteroid {
+func CreateAsteroid(id string, position *Point, angle float64, velocity *Vector, shape []*Point) *Asteroid {
+	// calculate radius
+	var radius float64 = 0
+	zero := &Point{0, 0}
+	for _, p := range shape {
+		d := DistanceBetweenPoints(zero, p)
+		if d > radius {
+			radius = d
+		}
+	}
+
 	return &Asteroid{
 		Id:       id,
 		Alive:    true,
 		Died:     0,
-		Position: p,
-		Angle:    a,
-		Velocity: v,
-		Shape:    s,
+		Position: position,
+		Angle:    angle,
+		Velocity: velocity,
+		Shape:    shape,
+		Radius:   radius,
 	}
 }
 
@@ -72,5 +84,6 @@ func (a *Asteroid) Tick(t uint64, state *GameState) *Asteroid {
 		Angle:    a.Angle,
 		Velocity: a.Velocity,
 		Shape:    a.Shape,
+		Radius:   a.Radius,
 	}
 }

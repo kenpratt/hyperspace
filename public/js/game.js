@@ -59,6 +59,7 @@ var serverObjectFieldMap = {
   a: "angle",
   v: "velocity",
   s: "shape",
+  d: "radius",
   l: "acceleration",
   r: "rotation",
   c: "created",
