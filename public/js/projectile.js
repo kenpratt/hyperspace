@@ -17,11 +17,7 @@ var Projectile = function(game, settings) {
   }
 
   this.update = function(elapsedMillis) {
-    var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
-
-    this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
-    this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
-    // All asteroid deletion is done in handleUpdate function.
+    this.applyPhysics(elapsedMillis);
   };
 
   this.draw = function(ctx) {
@@ -36,4 +32,12 @@ var Projectile = function(game, settings) {
         true); // Anticlockwise?
     ctx.fill();
   };
+};
+
+Projectile.prototype.applyPhysics = function(elapsedMillis) {
+  var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
+
+  this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
+  this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
+  // All projectile deletion is done in handleUpdate function.
 };

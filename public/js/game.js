@@ -103,8 +103,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     }
 
     // Simulate physics since server sent this message
-    // TODO: Just update physics, not key positions and such
-    obj.update(elapsed);
+    obj.applyPhysics(elapsed);
   }
 
   // add/update projectiles
@@ -120,7 +119,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     }
 
     // Simulate physics since server sent this message
-    obj.update(elapsed);
+    obj.applyPhysics(elapsed);
   }
 
   // This actually does work. Deletes all projectiles once the server sets alive to false.
@@ -146,6 +145,6 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     }
 
     // Simulate physics since server sent this message
-    obj.update(elapsed);
+    obj.applyPhysics(elapsed);
   }
 };

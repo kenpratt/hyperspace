@@ -3,6 +3,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // ships in that it has an update loop (called every tick) that takes in
   // directions from the keyboard.
   var extra = {
+    ownShip: true,
     color:"#f07",
     pressed: {
       forward: false,
@@ -16,12 +17,11 @@ Hyperspace.prototype.addOwnShip = function(data) {
     // Movement is based off of this SO article which basically reminded me how
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function(elapsedMillis) {
-      // This keeps the players ship always in the center.
-      this.c.renderer.setViewCenter(this.center);
-
-      // Move ship forward and/or rotate
+      this.checkInputs();
       this.applyPhysics(elapsedMillis);
+    },
 
+    checkInputs: function() {
       var last_pressed = {};
       for (i in this.pressed) {
         last_pressed[i] = this.pressed[i];
@@ -104,6 +104,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
 
 Hyperspace.prototype.addEnemyShip = function(data) {
   var extra = {
+    ownShip: false,
     color:"#0f7",
     update: function(elapsedMillis) {
       this.applyPhysics(elapsedMillis);
@@ -141,6 +142,11 @@ var Ship = function(game, settings) {
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {
+    if (this.ownShip) {
+      // This keeps the player's ship always in the center.
+      this.c.renderer.setViewCenter(this.center);
+    }
+
     // The color of the outline of the ship.
     ctx.strokeStyle = settings.color;
     ctx.fillStyle = increaseBrightness(settings.color, 10);
@@ -188,4 +194,4 @@ Ship.prototype.applyPhysics = function(elapsedMillis) {
   this.velocity = newVelocity;
   this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
   this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
-}
+};

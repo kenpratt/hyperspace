@@ -16,10 +16,7 @@ var Asteroid = function(game, settings) {
   this.zindex = -1;
 
   this.update = function(elapsedMillis) {
-    var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
-
-    this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
-    this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
+    this.applyPhysics(elapsedMillis);
   };
 
   this.draw = function(ctx) {
@@ -33,4 +30,11 @@ var Asteroid = function(game, settings) {
     }
     ctx.fill();
   };
+};
+
+Asteroid.prototype.applyPhysics = function(elapsedMillis) {
+  var elapsed = this.game.clientUpdatesEnabled ? elapsedMillis / 1000 : 0;
+
+  this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
+  this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
 };
