@@ -14,13 +14,13 @@ const (
 	ProjectileRadius = 10
 )
 
-func CreateProjectile(id string, pos *Point, angle float64, created uint64, owner string) *Projectile {
+func CreateProjectile(id string, pos *Point, angle float64, velocity *Vector, created uint64, owner string) *Projectile {
 
 	return &Projectile{
 		Id:       id,
 		Alive:    true,
 		Position: pos,
-		Velocity: RoundVector(AngleAndSpeedToVector(angle, settings.constants.ProjectileSpeed)),
+		Velocity: RoundVector(AddVectors(velocity, AngleAndSpeedToVector(angle, settings.constants.ProjectileSpeed))),
 		Created:  created,
 		Owner:    owner,
 	}

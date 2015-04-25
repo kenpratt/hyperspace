@@ -116,7 +116,7 @@ func (e *FireEvent) Execute(state *GameState) error {
 	}
 
 	pos := *s.Position // Clone ship position
-	projectile := CreateProjectile(e.projectileId, &pos, s.Angle, e.created, e.shipId)
+	projectile := CreateProjectile(e.projectileId, &pos, s.Angle, s.Velocity, e.created, e.shipId)
 	state.Projectiles[projectile.Id] = projectile
 	return nil
 }

@@ -67,7 +67,7 @@ Hyperspace.prototype.addOwnShip = function(data) {
             id: projectileId,
             alive: true,
             center: { x:this.center.x, y:this.center.y },
-            velocity: utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed),
+            velocity: utils.addVectors(this.velocity, utils.angleAndSpeedToVector(this.angle, this.game.constants.projectile_speed)),
             angle: this.angle,
             owner: this.id,
           });
@@ -188,6 +188,4 @@ Ship.prototype.applyPhysics = function(elapsedMillis) {
   this.velocity = newVelocity;
   this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
   this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
-
-
 }

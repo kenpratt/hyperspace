@@ -31,4 +31,5 @@
 * DONE Compare msgpack, LZW encoding, protobuf (create some sample data with a few ships, a bunch of projectiles & asteroids)
 * DONE Fix deletion of dead objects -- either auto-delete after X seconds, or track last-synced timestamp of each connected client, and maintain a "low water mark" in game, pass that into history on tick so it knows what it can cull
 * TODO Split collision detection into a separate step after all positions have been updated
-* TODO Add ship velocity to projectiles
+* DONE Add ship velocity to projectiles
+* TODO When position is incorrect, smooth it with a vector instead of jumping right there

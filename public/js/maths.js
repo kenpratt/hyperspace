@@ -49,6 +49,12 @@ var utils = {
       y: vector.y * a,
     };
   },
+  addVectors: function(v1, v2) {
+    return {
+      x: v1.x + v2.x,
+      y: v1.y + v2.y,
+    };
+  },
   simpleMovingAverage: function(period, toDiscard) {
     var nums = new Array(period);
     for (var i = 0; i < period; i++) {
