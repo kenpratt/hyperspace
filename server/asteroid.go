@@ -27,7 +27,7 @@ func RandomAsteroidGeometry() (*Point, float64, *Vector, []*Point) {
 
 	return MakePoint(float64(Random(-1000, 1000)), float64(Random(-1000, 1000))),
 		RandomAngle(),
-		RoundVector(AngleAndSpeedToVector(RandomAngle(), uint16(Random(10, 50)))),
+		RoundVector(AngleAndSpeedToVector(RandomAngle(), float64(Random(10, 50)))),
 		shape
 }
 
@@ -44,11 +44,13 @@ func CreateAsteroid(id string, p *Point, a float64, v *Vector, s []*Point) *Aste
 
 func (a *Asteroid) Tick(t uint64, state *GameState) *Asteroid {
 	// calculate time since last update (in milliseconds)
-	elapsed := t - state.Time
+	elapsedMillis := t - state.Time
+
+	// elapsed time in percentage of a second
+	elapsed := float64(elapsedMillis) / 1000
 
 	// calculate new position
-	x, y := AmountToMove(a.Velocity, elapsed)
-	pos := MakePoint(a.Position.X+x, a.Position.Y+y)
+	pos := MakePoint(a.Position.X+a.Velocity.X*elapsed, a.Position.Y+a.Velocity.Y*elapsed)
 
 	// return copy of object with new position
 	return &Asteroid{

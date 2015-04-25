@@ -40,12 +40,12 @@ func RoundVector(v *Vector) *Vector {
 // Converts an angle in degrees between 0 and 359.
 func AngleToVector(angle float64) *Vector {
 	// Convert to radians.
-	r := float64(angle) * 0.01745
+	r := angle * 0.01745
 	return UnitVector(&Vector{X: math.Sin(r), Y: -math.Cos(r)})
 }
 
-func AngleAndSpeedToVector(angle float64, speed uint16) *Vector {
-	return MultiplyVector(AngleToVector(angle), int(speed))
+func AngleAndSpeedToVector(angle float64, speed float64) *Vector {
+	return MultiplyVector(AngleToVector(angle), speed)
 }
 
 func Magnitude(vector *Vector) float64 {
@@ -59,25 +59,22 @@ func UnitVector(vector *Vector) *Vector {
 	}
 }
 
-func MultiplyVector(vector *Vector, a int) *Vector {
+func MultiplyVector(vector *Vector, f float64) *Vector {
 	return &Vector{
-		X: (vector.X * float64(a)),
-		Y: (vector.Y * float64(a)),
+		X: vector.X * f,
+		Y: vector.Y * f,
+	}
+}
+
+func AddVectors(vector1 *Vector, vector2 *Vector) *Vector {
+	return &Vector{
+		X: vector1.X + vector2.X,
+		Y: vector1.Y + vector2.Y,
 	}
 }
 
 func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
-}
-
-func AmountToRotate(direction int8, speed uint16, elapsed uint64) float64 {
-	d := float64(speed) * float64(elapsed) / 1000
-	return float64(direction) * d
-}
-
-func AmountToMove(velocity *Vector, elapsed uint64) (float64, float64) {
-	d := float64(elapsed) / 1000
-	return velocity.X * d, velocity.Y * d
 }
 
 func Random(min int, max int) int {

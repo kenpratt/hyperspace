@@ -34,9 +34,10 @@ type GameSettings struct {
 }
 
 type GameConstants struct {
-	ShipAcceleration uint16 `json:"ship_acceleration"`
-	ShipRotation     uint16 `json:"ship_rotation"`
-	ProjectileSpeed  uint16 `json:"projectile_speed"`
+	ShipAcceleration float64 `json:"ship_acceleration"`
+	ShipRotation     float64 `json:"ship_rotation"`
+	ShipDrag         float64 `json:"ship_drag"`
+	ProjectileSpeed  float64 `json:"projectile_speed"`
 }
 
 type GameError struct {
@@ -57,9 +58,10 @@ var settings = &GameSettings{
 
 	// Game constants, values are all per-second
 	constants: &GameConstants{
-		ShipAcceleration: 100, // Pixels per second
-		ShipRotation:     100, // Degrees per second
-		ProjectileSpeed:  150, // Pixels per second
+		ShipAcceleration: 100,  // Pixels per second^2
+		ShipDrag:         -0.2, // Percentage reduction per second
+		ShipRotation:     100,  // Degrees per second
+		ProjectileSpeed:  150,  // Pixels per second
 	},
 }
 var game = CreateGame()
