@@ -85,3 +85,10 @@ func Random(min int, max int) int {
 func RandomAngle() float64 {
 	return float64(Random(0, 359))
 }
+
+func IsColliding(p1 *Point, r1 float64, p2 *Point, r2 float64) bool {
+	dx := p1.X - p2.X
+	dy := p1.Y - p2.Y
+	distance := math.Sqrt(float64(dx*dx + dy*dy))
+	return distance < (r1 + r2)
+}

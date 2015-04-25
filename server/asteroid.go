@@ -3,6 +3,7 @@ package main
 type Asteroid struct {
 	Id       string   `json:"i"`
 	Alive    bool     `json:"z"`
+	Died     uint64   `json:"-"`
 	Position *Point   `json:"p"`
 	Angle    float64  `json:"a"`
 	Velocity *Vector  `json:"v"`
@@ -35,6 +36,7 @@ func CreateAsteroid(id string, p *Point, a float64, v *Vector, s []*Point) *Aste
 	return &Asteroid{
 		Id:       id,
 		Alive:    true,
+		Died:     0,
 		Position: p,
 		Angle:    a,
 		Velocity: v,
@@ -56,6 +58,7 @@ func (a *Asteroid) Tick(t uint64, state *GameState) *Asteroid {
 	return &Asteroid{
 		Id:       a.Id,
 		Alive:    a.Alive,
+		Died:     a.Died,
 		Position: pos,
 		Angle:    a.Angle,
 		Velocity: a.Velocity,

@@ -77,7 +77,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
   var elapsed = this.conn.now() - state.time;
   var lastAppliedEventId = updateData.lastEvent;
 
-  // add/update ships
+  // Add/update ships
   for (id in state.ships) {
     var data = state.ships[id];
     var obj = this.ships[id];
@@ -106,7 +106,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     obj.applyPhysics(elapsed);
   }
 
-  // add/update projectiles
+  // Add/update projectiles
   for (id in state.projectiles) {
     var data = state.projectiles[id];
     var obj = this.projectiles[id];
@@ -122,17 +122,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     obj.applyPhysics(elapsed);
   }
 
-  // This actually does work. Deletes all projectiles once the server sets alive to false.
-  var ents = this.c.entities.all(Projectile);
-  for (var i in ents) {
-    var ent = ents[i];
-    if (ent && !ent.alive) {
-      // console.log("Destroying projectile", ent);
-      this.c.entities.destroy(ent);
-    }
-  }
-
-  // add/update asteroids
+  // Add/update asteroids
   for (id in state.asteroids) {
     var data = state.asteroids[id];
     var obj = this.asteroids[id];
@@ -146,5 +136,16 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
 
     // Simulate physics since server sent this message
     obj.applyPhysics(elapsed);
+  }
+
+  // Delete all objects once the server has set alive to false.
+  var ents = this.c.entities.all();
+  for (var i in ents) {
+    var ent = ents[i];
+    if (ent && !(ent instanceof Star) && !ent.alive) {
+      console.log("Destroying object", ent);
+      this.c.entities.destroy(ent);
+      // TODO remove from game object map(s)
+    }
   }
 };

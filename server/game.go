@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"time"
@@ -34,9 +32,11 @@ type GameSettings struct {
 }
 
 type GameConstants struct {
+	ShipRadius       float64 `json:"ship_radius"`
 	ShipAcceleration float64 `json:"ship_acceleration"`
 	ShipRotation     float64 `json:"ship_rotation"`
 	ShipDrag         float64 `json:"ship_drag"`
+	ProjectileRadius float64 `json:"projectile_radius"`
 	ProjectileSpeed  float64 `json:"projectile_speed"`
 }
 
@@ -58,9 +58,11 @@ var settings = &GameSettings{
 
 	// Game constants, values are all per-second
 	constants: &GameConstants{
+		ShipRadius:       10,   // Pixels
 		ShipAcceleration: 100,  // Pixels per second^2
 		ShipDrag:         -0.2, // Percentage reduction per second
 		ShipRotation:     200,  // Degrees per second
+		ProjectileRadius: 10,   // Pixels
 		ProjectileSpeed:  180,  // Pixels per second
 	},
 }
@@ -107,10 +109,11 @@ func (g *Game) Run() {
 				delete(g.clients, c)
 			}
 		case <-gameUpdateTicker.C:
-			state := g.history.Tick(g.lowestSeenUpdateTime())
-			if settings.debug {
-				log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
-			}
+			g.history.Tick(g.lowestSeenUpdateTime())
+			// state := g.history.Tick(g.lowestSeenUpdateTime())
+			// if settings.debug {
+			// 	log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
+			// }
 		}
 	}
 }
