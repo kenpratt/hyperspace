@@ -9,16 +9,16 @@
 * TODO Update diffs instead of full updates
 * DONE Server-side collision detection
 * TODO Client-side collision detection
-* TODO Missiles hitting things
-* TODO Health
+* DONE Missiles hitting things
+* DONE Health
 * TODO Asteroids splitting (predetermined chunk sizes and ids?)
 * DONE Client disconnect -> death/disappear
 * DONE Better ids for projectiles
 * TODO Large game map, viewports with smart data sync
 * DONE Prediction, interpolation, lag compensation, etc
 * TODO Profiling/benchmarking
-* TODO Health bars
-* TODO Death detection
+* DONE Health bars
+* DONE Death detection
 * TODO Score
 * TODO Death animation
 * TODO Spawn animation
@@ -30,12 +30,17 @@
 * DONE Use SMA for clock diff
 * DONE Compare msgpack, LZW encoding, protobuf (create some sample data with a few ships, a bunch of projectiles & asteroids)
 * DONE Fix deletion of dead objects -- either auto-delete after X seconds, or track last-synced timestamp of each connected client, and maintain a "low water mark" in game, pass that into history on tick so it knows what it can cull
-* TODO Split collision detection into a separate step after all positions have been updated
+* DONE Split collision detection into a separate step after all positions have been updated
 * DONE Add ship velocity to projectiles
 * TODO When position is incorrect, smooth it with a vector instead of jumping right there
 * TODO Replace panic and log.Fatal statements with error logs, so at least an error won't crash it
 * TODO Measure server timestamps as time since boot? (To make the numbers smaller and hence cut down on data)
 * TODO Smarter updates: if asterdoid created time <= last update, remove shape data and other non-changing info?
+* TODO Re-swawn new asteroids after some die
+* TODO Do 3-phase collision detection -- first a really rough estimate, then second phase checking hitbox intersection, then third phase of actual ploygon intersection
+* TODO Add alien space-ships
+* TODO Randomize spawn points! (especially with ship-ship collisions)
+* TODO Faster collision detection? -> http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
 
 Notes from arcade game:
 * Bullets are very bright, pulse, and leave both a bright trail and a slight trail , looking like shooting starts.
@@ -43,3 +48,7 @@ Notes from arcade game:
 * Alien spaceships that move around erratically trying to kill you.
 * Asteroids are more blocky, leave alpha trails.
 * Ship breaks apart into lines when killed.
+
+When hitting asteroid:
+* If small, kill it
+* If not small, kill and create two new asteroids with ~1/2 the size, in deterministic manner
