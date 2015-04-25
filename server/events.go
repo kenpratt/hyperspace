@@ -132,10 +132,20 @@ func (e *TickEvent) Time() uint64 {
 }
 
 func (e *TickEvent) Execute(state *GameState) error {
-	// delete projectiles that died long enough ago that all clients have seen their dead status
+	// delete objects that died long enough ago that all clients have seen their dead status
+	for id, p := range state.Ships {
+		if !p.Alive && p.Died <= e.syncedUntil {
+			delete(state.Ships, id)
+		}
+	}
 	for id, p := range state.Projectiles {
 		if !p.Alive && p.Died <= e.syncedUntil {
 			delete(state.Projectiles, id)
+		}
+	}
+	for id, p := range state.Asteroids {
+		if !p.Alive && p.Died <= e.syncedUntil {
+			delete(state.Asteroids, id)
 		}
 	}
 	return nil
