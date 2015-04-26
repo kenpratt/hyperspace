@@ -39,7 +39,7 @@
 * TODO Re-swawn new asteroids after some die
 * TODO Do 3-phase collision detection -- first a really rough estimate, then second phase checking hitbox intersection, then third phase of actual ploygon intersection
 * TODO Add alien space-ships
-* TODO Randomize spawn points! (especially with ship-ship collisions)
+* DONE Randomize spawn points! (especially with ship-ship collisions)
 * TODO Faster collision detection? -> http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
 * TODO Refactor go LZW implementation to use io.Reader and io.Writer streams, and stream data right into websocket
 
