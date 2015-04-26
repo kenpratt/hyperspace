@@ -17,7 +17,9 @@ var Projectile = function(game, settings) {
   }
 
   this.update = function(elapsedMillis) {
-    this.applyPhysics(elapsedMillis);
+    if (this.game.clientUpdatesEnabled) {
+      this.applyPhysics(elapsedMillis);
+    }
   };
 
   this.draw = function(ctx) {

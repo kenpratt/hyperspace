@@ -18,7 +18,9 @@ Hyperspace.prototype.addOwnShip = function(data) {
     // vectors work: http://stackoverflow.com/a/3639025/1063
     update: function(elapsedMillis) {
       this.checkInputs();
-      this.applyPhysics(elapsedMillis);
+      if (this.game.clientUpdatesEnabled) {
+        this.applyPhysics(elapsedMillis);
+      }
     },
 
     checkInputs: function() {
@@ -107,7 +109,9 @@ Hyperspace.prototype.addEnemyShip = function(data) {
     ownShip: false,
     color:"#0f7",
     update: function(elapsedMillis) {
-      this.applyPhysics(elapsedMillis);
+      if (this.game.clientUpdatesEnabled) {
+        this.applyPhysics(elapsedMillis);
+      }
     },
   };
   for (k in extra) { data[k] = extra[k]; }
@@ -165,8 +169,6 @@ var Ship = function(game, settings) {
 };
 
 Ship.prototype.applyPhysics = function(elapsedMillis) {
-  if (!this.game.clientUpdatesEnabled) { return; }
-
   var elapsed = elapsedMillis / 1000;
 
   // Apply rotation
