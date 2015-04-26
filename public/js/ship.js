@@ -4,7 +4,6 @@ Hyperspace.prototype.addOwnShip = function(data) {
   // directions from the keyboard.
   var extra = {
     ownShip: true,
-    color:"#f07",
     pressed: {
       forward: false,
       down: false,
@@ -107,7 +106,6 @@ Hyperspace.prototype.addOwnShip = function(data) {
 Hyperspace.prototype.addEnemyShip = function(data) {
   var extra = {
     ownShip: false,
-    color:"#0f7",
     update: function(elapsedMillis) {
       if (this.game.clientUpdatesEnabled) {
         this.applyPhysics(elapsedMillis);

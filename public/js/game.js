@@ -54,6 +54,7 @@ var Hyperspace = function(params) {
 
 var serverObjectFieldMap = {
   i: "id",
+  k: "color",
   z: "alive",
   p: "center",
   a: "angle",

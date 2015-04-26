@@ -9,6 +9,7 @@ type GameEvent interface {
 type CreateShipEvent struct {
 	time     uint64
 	id       string
+	color    string
 	position *Point
 }
 
@@ -17,7 +18,7 @@ func (e *CreateShipEvent) Time() uint64 {
 }
 
 func (e *CreateShipEvent) Execute(state *GameState) error {
-	state.Ships[e.id] = CreateShip(e.id, e.position)
+	state.Ships[e.id] = CreateShip(e.id, e.color, e.position)
 	return nil
 }
 

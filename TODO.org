@@ -1,7 +1,7 @@
 * TODO Remove Coquette
 * DONE Accurate client/server time and latency measurements (try to piggyback on WebSocket pings?)
 * DONE Calculate actual elapsed time when doing physics, instead of fixed interval
-* TODO Ship colors - generate different colors for ships server side, sync in data
+* DONE Ship colors - generate different colors for ships server side, sync in data
 * DONE Asteroids flying around (spawn with size and velocity -- for bonus points, make them spin)
 * DONE Ship drift/velocity
 * TODO Move stars server side
