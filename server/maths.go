@@ -73,6 +73,13 @@ func AddVectors(vector1 *Vector, vector2 *Vector) *Vector {
 	}
 }
 
+func AddVectorToPoint(vector *Vector, point *Point) *Point {
+	return &Point{
+		X: point.X + vector.X,
+		Y: point.Y + vector.Y,
+	}
+}
+
 func MakeTimestamp() uint64 {
 	return uint64(time.Now().UnixNano() / int64(time.Millisecond))
 }

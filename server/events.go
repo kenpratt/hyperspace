@@ -25,10 +25,7 @@ func (e *CreateShipEvent) Execute(state *GameState) error {
 type CreateAsteroidEvent struct {
 	time     uint64
 	id       string
-	position *Point
-	angle    float64
-	velocity *Vector
-	shape    []*Point
+	geometry *AsteroidGeometry
 }
 
 func (e *CreateAsteroidEvent) Time() uint64 {
@@ -36,7 +33,7 @@ func (e *CreateAsteroidEvent) Time() uint64 {
 }
 
 func (e *CreateAsteroidEvent) Execute(state *GameState) error {
-	state.Asteroids[e.id] = CreateAsteroid(e.id, e.position, e.angle, e.velocity, e.shape)
+	state.Asteroids[e.id] = CreateAsteroid(e.id, e.geometry)
 	return nil
 }
 

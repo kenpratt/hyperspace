@@ -11,7 +11,7 @@
 * TODO Client-side collision detection
 * DONE Missiles hitting things
 * DONE Health
-* TODO Asteroids splitting (predetermined chunk sizes and ids?)
+* DONE Asteroids splitting (predetermined chunk sizes and ids?)
 * DONE Client disconnect -> death/disappear
 * DONE Better ids for projectiles
 * TODO Large game map, viewports with smart data sync

@@ -79,8 +79,8 @@ func CreateGame() *Game {
 	// Create asteroids
 	for i := 0; i < 100; i++ {
 		id := g.generateId()
-		p, a, v, s := RandomAsteroidGeometry()
-		g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, p, a, v, s})
+		geom := RandomAsteroidGeometry()
+		g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, geom})
 	}
 
 	return g

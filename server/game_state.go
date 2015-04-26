@@ -126,9 +126,20 @@ func (s *GameState) Tick(t uint64) *GameState {
 
 			if IsColliding(a.Position, a.Radius, p.Position, settings.constants.ProjectileRadius) {
 				log.Println(fmt.Sprintf("Asteroid %v collided with Projectile %v", a.Id, p.Id))
-				// TODO: Asteroid should break apart
+
+				// create new asteroids
+				if a.Splittable() {
+					a1, a2 := a.Split()
+					state.Asteroids[a1.Id] = a1
+					state.Asteroids[a2.Id] = a2
+				}
+
+				// destroy asteroid and projectile
+				a.Alive = false
+				a.Died = t
 				p.Alive = false
 				p.Died = t
+
 			}
 		}
 
