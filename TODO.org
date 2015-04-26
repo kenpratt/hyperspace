@@ -41,6 +41,7 @@
 * TODO Add alien space-ships
 * TODO Randomize spawn points! (especially with ship-ship collisions)
 * TODO Faster collision detection? -> http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
+* TODO Refactor go LZW implementation to use io.Reader and io.Writer streams, and stream data right into websocket
 
 Notes from arcade game:
 * Bullets are very bright, pulse, and leave both a bright trail and a slight trail , looking like shooting starts.
@@ -48,7 +49,3 @@ Notes from arcade game:
 * Alien spaceships that move around erratically trying to kill you.
 * Asteroids are more blocky, leave alpha trails.
 * Ship breaks apart into lines when killed.
-
-When hitting asteroid:
-* If small, kill it
-* If not small, kill and create two new asteroids with ~1/2 the size, in deterministic manner
