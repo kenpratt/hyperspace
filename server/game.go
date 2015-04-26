@@ -50,6 +50,7 @@ func (e GameError) Error() string {
 
 const (
 	gameUpdatePeriod = 10 * time.Millisecond
+	updateTimeBuffer = 2000 // in milliseconds
 )
 
 // TODO: Get this working without a global variable, I guess pass a ref to game into the web socket handler function?
@@ -126,7 +127,7 @@ func (g *Game) generateId() string {
 func (g *Game) lowestSeenUpdateTime() uint64 {
 	var lowest uint64 = math.MaxUint64
 	for c, _ := range g.clients {
-		t := c.LastUpdateTime()
+		t := c.LastUpdateTime() - updateTimeBuffer
 		if t < lowest {
 			lowest = t
 		}
