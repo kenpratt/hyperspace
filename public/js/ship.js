@@ -146,11 +146,6 @@ var Ship = function(game, settings) {
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {
-    if (this.ownShip) {
-      // This keeps the player's ship always in the center.
-      this.c.renderer.setViewCenter(this.center);
-    }
-
     // The color of the outline of the ship.
     ctx.strokeStyle = settings.color;
     ctx.fillStyle = increaseBrightness(settings.color, 10);
@@ -196,4 +191,9 @@ Ship.prototype.applyPhysics = function(elapsedMillis) {
   this.velocity = newVelocity;
   this.center.x = utils.roundToPlaces(this.center.x + this.velocity.x * elapsed, 1);
   this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
+
+  // This keeps the player's ship always in the center.
+  if (this.ownShip) {
+    this.c.renderer.setViewCenter(this.center);
+  }
 };
