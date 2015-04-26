@@ -84,15 +84,15 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
     var obj = this.ships[id];
     if (obj) {
       // Check if we should skip this update
-      if (id === this.playerId) {
-        if (obj.lastEventId > lastAppliedEventId) {
-          // TODO: Instead of skipping update entirely, just update life total and alive status
-          continue;
-        }
+      if (id === this.playerId && obj.lastEventId > lastAppliedEventId) {
+        // Don't update position, but still update alive status
+        obj.alive = data.z;
+        continue;
+      } else {
+        // console.log("Updating ship", data);
+        copyGameObjectData(obj, data);
       }
 
-      // console.log("Updating ship", data);
-      copyGameObjectData(obj, data);
     } else {
       if (id === this.playerId) {
         // console.log("Adding own ship");
