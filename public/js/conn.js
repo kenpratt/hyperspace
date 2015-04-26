@@ -91,8 +91,12 @@ ServerConnection.prototype.onHeartbeat = function(data, serverTime) {
   var now = Date.now();
   var elapsed = now - this.heartbeatSentAt;
 
-  // update estimated client/server clock difference
-  this.clockDiff = Math.round(this.clockDiffSMA(now - Math.round(elapsed/2) - serverTime));
+  // estimate clock difference as amout of millis that the server clock is *ahead* of the client clock
+  var estimatedCurrentServerTime = serverTime + elapsed/2;
+  var diff = estimatedCurrentServerTime - now;
+
+  // take a simple moving average of the estimated difference
+  this.clockDiff = Math.round(this.clockDiffSMA(diff));
 };
 
 ServerConnection.prototype.onUpdate = function(data, serverTime) {
@@ -104,5 +108,6 @@ ServerConnection.prototype.onUpdate = function(data, serverTime) {
 };
 
 ServerConnection.prototype.now = function() {
+  // clockDiff = millis that server clock is ahead of client clock, so add it to current time to get estimate of server time
   return Date.now() + this.clockDiff;
 };
