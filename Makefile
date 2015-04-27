@@ -12,7 +12,7 @@ kill:
 restart:
 	make kill
 	cd server ; go build
-	./server/server -debug -port 9393 & echo $$! > $(PID)
+	./server/server -port 9393 & echo $$! > $(PID)
 
 clean:
 	rm -f server/server
