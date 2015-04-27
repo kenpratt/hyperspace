@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 )
 
 type GameState struct {
@@ -33,20 +32,9 @@ func (s *GameState) Tick(t uint64) *GameState {
 	// create new state
 	state := CreateGameState(t)
 
-	// Store Min/Max X and Y for ships
-	var maxX float64
-	var minX float64
-	var maxY float64
-	var minY float64
-
 	for _, o := range s.Ships {
 		p := o.Tick(t, s)
 		if p != nil {
-			maxX = math.Max(maxX, p.Position.X+500)
-			minX = math.Min(minX, p.Position.X-500)
-			maxY = math.Max(maxY, p.Position.Y+300)
-			minY = math.Min(minY, p.Position.Y-300)
-
 			state.Ships[p.Id] = p
 		}
 	}
@@ -152,14 +140,6 @@ func (s *GameState) Tick(t uint64) *GameState {
 				p.Alive = false
 				p.Died = t
 
-			}
-		}
-
-		// Auto-destroy asteroids no one can see
-		if a.Position.X < minX || a.Position.X > maxX {
-			if a.Position.Y < minY || a.Position.Y > maxY {
-				a.Alive = false
-				a.Died = t
 			}
 		}
 

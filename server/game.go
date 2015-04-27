@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"time"
@@ -114,34 +112,11 @@ func (g *Game) Run() {
 				delete(g.clients, c)
 			}
 		case <-gameUpdateTicker.C:
-			state := g.history.Tick(g.lowestSeenUpdateTime())
-
-			// Spawn more if there aren't enough.
-			maxX := float64(1000)
-			minX := float64(-1000)
-			maxY := float64(1000)
-			minY := float64(-1000)
-			for _, o := range state.Ships {
-				if o.Alive {
-					maxX = math.Max(maxX, o.Position.X+500)
-					minX = math.Min(minX, o.Position.X-500)
-					maxY = math.Max(maxY, o.Position.Y+300)
-					minY = math.Min(minY, o.Position.Y-300)
-				}
-			}
-			assCount := math.Max((math.Abs(maxX)-math.Abs(minX))/10.0, (math.Abs(maxY)-math.Abs(minY))/10.0)
-			assCount = math.Max(assCount, 100.0)
-			for i := len(state.Asteroids); i < int(math.Ceil(assCount)); i++ {
-				id := g.generateId()
-				geom := RandomAsteroidGeometry()
-				geom.Position = MakePoint(float64(RandomFloat(minX, maxX)), float64(RandomFloat(minX, maxX)))
-				g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, geom})
-			}
-
-			if settings.debug {
-				log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d, Asteroids: %d", len(state.Ships), len(state.Projectiles), len(state.Asteroids)))
-				log.Println(fmt.Sprintf("X: %v, %v Y: %v, %v, assCount: %v", minX, maxX, minY, maxY, assCount))
-			}
+			g.history.Tick(g.lowestSeenUpdateTime())
+			// state := g.history.Tick(g.lowestSeenUpdateTime())
+			// if settings.debug {
+			// 	log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
+			// }
 		}
 	}
 }
