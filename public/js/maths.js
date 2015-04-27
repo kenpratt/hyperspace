@@ -31,6 +31,13 @@ var utils = {
     var r = angle * 0.01745;
     return utils.unitVector({ x: Math.sin(r), y: -Math.cos(r) });
   },
+  vectorToAngle: function(vector) {
+    var angle = Math.atan2(vector.y, vector.x) + Math.PI/2;
+    while (angle < 0) {
+        angle += (2*Math.PI);
+    }
+    return angle % (2*Math.PI);
+  },
   magnitude: function(vector) {
     return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
   },

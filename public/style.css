@@ -1,0 +1,26 @@
+body {
+    background-color: rgb(31, 31, 31);
+    padding: 1em;
+    color: #ddd;
+}
+
+h1 {
+    margin: 30px 0 30px 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 70px;
+    text-shadow: 6px -6px 2px rgb(255, 71, 103), 12px -12px 4px green, 18px -18px 6px blue, 24px -24px 8px purple;
+}
+
+.controls {
+    margin: 30px 0 0 0;
+}
+
+.key {
+    display: inline-block;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+}
