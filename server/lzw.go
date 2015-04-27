@@ -1,6 +1,6 @@
 package main
 
-import "fmt"
+import "log"
 
 // Compress a string to a list of output symbols.
 func LzwCompress(uncompressed []byte) string {
@@ -53,7 +53,8 @@ func LzwDecompress(raw string) []byte {
 		} else if k == RuneFor(dictSize) {
 			entry = w + w[:1]
 		} else {
-			panic(fmt.Sprintf("Bad compressed k: %d", k))
+			log.Println("Error compressing to LZW", k)
+			return nil
 		}
 
 		result += entry

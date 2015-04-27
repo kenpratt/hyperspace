@@ -53,7 +53,8 @@ func (c *Connection) readPump() {
 		// read raw message off the socket
 		_, raw, err := c.ws.ReadMessage()
 		if err != nil {
-			panic(err)
+			log.Println("Error reading message off socket", err)
+			break
 		}
 
 		// uncompress LZW
@@ -63,7 +64,8 @@ func (c *Connection) readPump() {
 		var message Message
 		err = json.Unmarshal(uncompressed, &message)
 		if err != nil {
-			panic(err)
+			log.Println("Error unmarshalling JSON", err)
+			continue
 		}
 
 		// process the message
@@ -89,7 +91,8 @@ func (c *Connection) writeMessage(message *Message) error {
 	// marshal to JSON
 	str, err := json.Marshal(message)
 	if err != nil {
-		panic(err)
+		log.Println("Error marshalling message to JSON", err)
+		return nil
 	}
 
 	// compress with LZW

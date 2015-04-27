@@ -23,7 +23,7 @@ func CreateGameState(t uint64) *GameState {
 
 func (s *GameState) Tick(t uint64) *GameState {
 	if t < s.Time {
-		log.Fatalf("Tried to call tick with timestamp lower than previous tick: %d, %d", s.Time, t)
+		log.Printf("Tried to call tick with timestamp lower than previous tick: %d, %d", s.Time, t)
 		return nil
 	}
 

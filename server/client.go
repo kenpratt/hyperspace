@@ -35,7 +35,8 @@ func (c *Client) Initialize(playerId string, gameConstants *GameConstants, gameS
 	// send initial player data to client
 	b, err := json.Marshal(&InitData{playerId, gameConstants, gameState})
 	if err != nil {
-		panic(err)
+		log.Println("Error marshalling initial state", err)
+		return
 	}
 	raw := json.RawMessage(b)
 	c.Send(&Message{Type: "init", Time: MakeTimestamp(), Data: &raw})
@@ -78,7 +79,8 @@ func (c *Client) handleMessage(message *Message) {
 		var data AccelerationData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error unpacking event data", err)
+			return
 		}
 		game.history.Run(&ChangeAccelerationEvent{message.Time, c.playerId, data.Direction})
 		c.updateLastAppliedEvent(data.EventId)
@@ -86,7 +88,8 @@ func (c *Client) handleMessage(message *Message) {
 		var data RotationData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error unpacking event data", err)
+			return
 		}
 		game.history.Run(&ChangeRotationEvent{message.Time, c.playerId, data.Direction})
 		c.updateLastAppliedEvent(data.EventId)
@@ -94,7 +97,8 @@ func (c *Client) handleMessage(message *Message) {
 		var data FireData
 		err := json.Unmarshal([]byte(*message.Data), &data)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error unpacking event data", err)
+			return
 		}
 		game.history.Run(&FireEvent{message.Time, c.playerId, data.ProjectileId, data.Created})
 		c.updateLastAppliedEvent(data.EventId)
@@ -106,14 +110,16 @@ func (c *Client) updateLastAppliedEvent(eventId uint64) {
 	if eventId > c.lastAppliedEventId {
 		c.lastAppliedEventId = eventId
 	} else {
-		log.Fatalf("Client got out-of-order event id: %d, %d", c.lastAppliedEventId, eventId)
+		log.Printf("Client got out-of-order event id: %d, %d", c.lastAppliedEventId, eventId)
+		return
 	}
 }
 
 func (c *Client) SendUpdate(state *GameState) {
 	b, err := json.Marshal(&UpdateData{state, c.lastAppliedEventId})
 	if err != nil {
-		panic(err)
+		log.Println("Error marshalling update", err)
+		return
 	}
 
 	raw := json.RawMessage(b)
