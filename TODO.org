@@ -22,7 +22,7 @@
 * TODO Score
 * TODO Death animation
 * TODO Spawn animation
-* TODO Minimap/radar and/or arrows indication direction to off-screen enemies
+* DONE Minimap/radar and/or arrows indication direction to off-screen enemies
 * DONE Use gopherjs (https://github.com/gopherjs/gopherjs) to sync game object construct and simulation logic? (not doing it)
 * DONE JSON stringify update message before sending to each client (not doing it -- now we have last event id)
 * TODO Wrap-around map? (probably won't have time for view-ports)
@@ -42,6 +42,8 @@
 * DONE Randomize spawn points! (especially with ship-ship collisions)
 * TODO Faster collision detection? -> http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
 * TODO Refactor go LZW implementation to use io.Reader and io.Writer streams, and stream data right into websocket
+* DONE Respawn player on death (or auto-refresh page)
+* TODO Detect objects coming back to life from server update, re add entity. (Or defer deletion for a bit and stop drawing when dead).
 
 Notes from arcade game:
 * Bullets are very bright, pulse, and leave both a bright trail and a slight trail , looking like shooting starts.
