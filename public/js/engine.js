@@ -691,7 +691,8 @@
     },
 
     onScreen: function(obj) {
-      return Maths.rectanglesIntersecting(obj, {
+      // return Maths.rectanglesIntersecting(obj, {
+      return Maths.unrotatedRectanglesIntersecting(obj, {
         size: this._viewSize,
         center: {
           x: this._viewCenter.x,

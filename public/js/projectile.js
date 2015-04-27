@@ -23,6 +23,10 @@ var Projectile = function(game, settings) {
   };
 
   this.draw = function(ctx) {
+    if (!this.c.renderer.onScreen(this)) {
+      return
+    }
+
     ctx.fillStyle = "#fff";
     ctx.beginPath();
     ctx.arc(
