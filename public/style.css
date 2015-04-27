@@ -1,4 +1,11 @@
 body {
-    background-color: rgb(11, 31, 50);
+    background-color: rgb(31, 31, 31);
     padding: 1em;
+}
+
+h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #ddd;
+    font-size: 70px;
+    text-shadow: 6px -6px 2px rgb(255, 71, 103), 12px -12px 4px green, 18px -18px 6px blue, 24px -24px 8px purple;
 }
