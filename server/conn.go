@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -53,7 +54,9 @@ func (c *Connection) readPump() {
 		// read raw message off the socket
 		_, raw, err := c.ws.ReadMessage()
 		if err != nil {
-			log.Println("Error reading message off socket", err)
+			if err != io.EOF {
+				log.Println("Error reading message off socket", err)
+			}
 			break
 		}
 
