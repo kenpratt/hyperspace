@@ -13,6 +13,10 @@ var Star = function(game, settings) {
     }
   };
   this.draw = function(ctx) {
+    if (!this.c.renderer.onScreen(this)) {
+      return
+    }
+
     ctx.fillStyle = increaseBrightness("#cc9933", this.brightness);
     ctx.fillRect(this.center.x, this.center.y, this.size.x, this.size.y);
   };

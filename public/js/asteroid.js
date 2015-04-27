@@ -22,6 +22,10 @@ var Asteroid = function(game, settings) {
   };
 
   this.draw = function(ctx) {
+    if (!this.c.renderer.onScreen(this)) {
+      return
+    }
+
     ctx.fillStyle = "rgb(119, 58, 28)";
     ctx.beginPath();
     for (i in this.shape) {

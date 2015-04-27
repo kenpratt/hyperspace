@@ -144,6 +144,10 @@ var Ship = function(game, settings) {
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {
+    if (!this.c.renderer.onScreen(this)) {
+      return
+    }
+
     // The color of the outline of the ship.
     ctx.strokeStyle = settings.color;
     ctx.fillStyle = increaseBrightness(settings.color, 10);
