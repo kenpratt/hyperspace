@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"time"
@@ -112,11 +114,19 @@ func (g *Game) Run() {
 				delete(g.clients, c)
 			}
 		case <-gameUpdateTicker.C:
-			g.history.Tick(g.lowestSeenUpdateTime())
-			// state := g.history.Tick(g.lowestSeenUpdateTime())
-			// if settings.debug {
-			// 	log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d", len(state.Ships), len(state.Projectiles)))
-			// }
+			state := g.history.Tick(g.lowestSeenUpdateTime())
+
+			// Spawn more if there aren't enough.
+			for i := len(state.Asteroids); i < 100; i++ {
+				id := g.generateId()
+				geom := RandomAsteroidGeometry()
+				g.history.Run(&CreateAsteroidEvent{MakeTimestamp(), id, geom})
+			}
+
+			if settings.debug {
+				log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d, Asteroids: %d", len(state.Ships), len(state.Projectiles), len(state.Asteroids)))
+				log.Println(fmt.Sprintf("X: %v, %v Y: %v, %v, assCount: %v", minX, maxX, minY, maxY, assCount))
+			}
 		}
 	}
 }
