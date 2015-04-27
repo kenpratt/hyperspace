@@ -2,6 +2,14 @@ body {
     background-color: rgb(31, 31, 31);
     padding: 1em;
     color: #ddd;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+article {
+    margin: 0 auto;
+    width: 1000px;
+    position: relative;
 }
 
 h1 {
@@ -9,6 +17,13 @@ h1 {
     font-family: 'Orbitron', sans-serif;
     font-size: 70px;
     text-shadow: 6px -6px 2px rgb(255, 71, 103), 12px -12px 4px green, 18px -18px 6px blue, 24px -24px 8px purple;
+}
+
+.online {
+    position: absolute;
+    right: 0;
+    top: 80px;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .controls {
@@ -22,5 +37,5 @@ h1 {
     padding: 2px;
     width: 18px;
     height: 18px;
-    text-align: center;
+    line-height: 22px;
 }

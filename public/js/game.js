@@ -187,4 +187,9 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
       // TODO: remove from game object map(s)
     }
   }
+
+  // update # of players
+  var numPlayers = this.c.entities.all(Ship).length;
+  document.getElementById("player-count").innerHTML = numPlayers;
+  document.getElementById("player-noun").innerHTML = numPlayers === 1 ? "player" : "players";
 };
