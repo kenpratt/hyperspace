@@ -114,6 +114,7 @@ Hyperspace.prototype.addEnemyShip = function(data) {
   };
   for (k in extra) { data[k] = extra[k]; }
   var ship = this.c.entities.create(Ship, data);
+  ship.indicator = this.c.entities.create(ShipIndicator, { ship: ship });
   this.ships[data.id] = ship;
   return ship;
 };
@@ -144,72 +145,93 @@ var Ship = function(game, settings) {
 
   // This is run every tick to draw the ship.
   this.draw = function(ctx) {
-    if (this.c.renderer.onScreen(this)) {
-      // The color of the outline of the ship.
-      ctx.strokeStyle = settings.color;
-      ctx.fillStyle = increaseBrightness(settings.color, 10);
-
-      // Draw the actual ship body.
-      ctx.beginPath();
-      for (i in ship_shape) {
-        var v = ship_shape[i];
-        var x = (v.x * this.scale) + this.center.x;
-        var y = (v.y * this.scale) + this.center.y;
-        ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      ctx.fill();
-    } else if (!this.ownShip) {
-      // Draw indication of off-screen ship
-
-      var viewSize = this.c.renderer.getViewSize();
-      var viewCenter = this.c.renderer.getViewCenter();
-
-      var halfWidth = viewSize.x / 2;
-      var halfHeight = viewSize.y / 2
-      var viewTopLeftAngle = utils.vectorToAngle({ x: -halfWidth, y: -halfHeight });
-      var viewTopRightAngle = utils.vectorToAngle({ x: halfWidth, y: -halfHeight });
-      var viewBottomLeftAngle = utils.vectorToAngle({ x: -halfWidth, y: halfHeight });
-      var viewBottomRightAngle = utils.vectorToAngle({ x: halfWidth, y: halfHeight });
-
-      var vecToEnemy = {
-        x: this.center.x - viewCenter.x,
-        y: this.center.y - viewCenter.y,
-      };
-
-      var angle = utils.vectorToAngle(vecToEnemy);
-
-      var dx, dy;
-      if (angle >= viewTopLeftAngle || angle <= viewTopRightAngle) {
-        dy = -halfHeight;
-        dx = (halfHeight) * Math.tan(angle);
-      } else if (angle >= viewTopRightAngle && angle <= viewBottomRightAngle) {
-        dx = halfWidth;
-        dy = -((halfWidth) * Math.tan(Math.PI/2 - angle));
-      } else if (angle >= viewBottomRightAngle && angle <= viewBottomLeftAngle) {
-        dy = halfHeight;
-        dx = (halfHeight) * Math.tan(Math.PI - angle);
-      } else {
-        dx = -halfWidth;
-        dy = (halfWidth) * Math.tan(3*Math.PI/2 - angle);
-      }
-
-      var x = viewCenter.x + Math.round(dx);
-      var y = viewCenter.y + Math.round(dy);
-
-      // draw offscreen indicator
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.moveTo(x-8, y);
-      ctx.lineTo(x, y-8);
-      ctx.lineTo(x+8, y);
-      ctx.lineTo(x, y+8);
-      ctx.lineTo(x-8, y);
-      ctx.stroke();
-      ctx.fill();
+    if (!this.c.renderer.onScreen(this)) {
+      return;
     }
+
+    // The color of the outline of the ship.
+    ctx.strokeStyle = settings.color;
+    ctx.fillStyle = increaseBrightness(settings.color, 10);
+
+    // Draw the actual ship body.
+    ctx.beginPath();
+    for (i in ship_shape) {
+      var v = ship_shape[i];
+      var x = (v.x * this.scale) + this.center.x;
+      var y = (v.y * this.scale) + this.center.y;
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.fill();
   };
 };
+
+var ShipIndicator = function(game, settings) {
+  this.c = game.c;
+  for (var i in settings) {
+    this[i] = settings[i];
+  }
+  this.zindex = -2;
+  this.width = 3 + (Math.random() * 4);
+  this.size = {x: this.width, y: this.width};
+
+  this.update = function() {
+  };
+
+  this.draw = function(ctx) {
+    // Draw indication of off-screen ship
+    if (this.c.renderer.onScreen(this.ship)) {
+      return
+    }
+
+    var viewSize = this.c.renderer.getViewSize();
+    var viewCenter = this.c.renderer.getViewCenter();
+    // var viewCenter = this.game.ships[this.game.playerId].center;
+
+    var halfWidth = viewSize.x / 2;
+    var halfHeight = viewSize.y / 2
+    var viewTopLeftAngle = utils.vectorToAngle({ x: -halfWidth, y: -halfHeight });
+    var viewTopRightAngle = utils.vectorToAngle({ x: halfWidth, y: -halfHeight });
+    var viewBottomLeftAngle = utils.vectorToAngle({ x: -halfWidth, y: halfHeight });
+    var viewBottomRightAngle = utils.vectorToAngle({ x: halfWidth, y: halfHeight });
+
+    var vecToEnemy = {
+      x: this.ship.center.x - viewCenter.x,
+      y: this.ship.center.y - viewCenter.y,
+    };
+
+    var angle = utils.vectorToAngle(vecToEnemy);
+
+    var dx, dy;
+    if (angle >= viewTopLeftAngle || angle <= viewTopRightAngle) {
+      dy = -halfHeight;
+      dx = (halfHeight) * Math.tan(angle);
+    } else if (angle >= viewTopRightAngle && angle <= viewBottomRightAngle) {
+      dx = halfWidth;
+      dy = -((halfWidth) * Math.tan(Math.PI/2 - angle));
+    } else if (angle >= viewBottomRightAngle && angle <= viewBottomLeftAngle) {
+      dy = halfHeight;
+      dx = (halfHeight) * Math.tan(Math.PI - angle);
+    } else {
+      dx = -halfWidth;
+      dy = (halfWidth) * Math.tan(3*Math.PI/2 - angle);
+    }
+
+    var x = viewCenter.x + Math.round(dx);
+    var y = viewCenter.y + Math.round(dy);
+
+    // draw offscreen indicator
+    ctx.fillStyle = this.ship.color;
+    ctx.beginPath();
+    ctx.moveTo(x-8, y);
+    ctx.lineTo(x, y-8);
+    ctx.lineTo(x+8, y);
+    ctx.lineTo(x, y+8);
+    ctx.lineTo(x-8, y);
+    ctx.fill();
+  };
+};
+
 
 Ship.prototype.applyPhysics = function(elapsedMillis) {
   var elapsed = elapsedMillis / 1000;
