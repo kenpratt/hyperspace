@@ -191,7 +191,7 @@ Ship.prototype.applyPhysics = function(elapsedMillis) {
   this.center.y = utils.roundToPlaces(this.center.y + this.velocity.y * elapsed, 1);
 
   // This keeps the player's ship always in the center.
-  if (this.ownShip) {
+  if (this.ownShip && this.alive) {
     this.c.renderer.setViewCenter(this.center);
   }
 };

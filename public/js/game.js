@@ -145,9 +145,46 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
   for (var i in ents) {
     var ent = ents[i];
     if (ent && !(ent instanceof Star) && !ent.alive) {
+      if (ent instanceof Ship && ent.ownShip) {
+        var EndText = function(game, settings) {
+          this.alive = true;
+          this.c = game.c;
+          this.center = {
+            y: settings.center.y,
+            x: settings.center.x - 200,
+          };
+          this.angle = 0;
+          this.zindex = 30;
+
+          this.text = "Game Over";
+          this.font = "small-caps 900 100px courier";
+          this.color = "red";
+
+          this.counter = 200;
+
+          this.draw = function() {
+            var ctx = this.c.renderer.getCtx();
+            ctx.font = this.font;
+            ctx.strokeStyle = this.color;
+            ctx.strokeText(this.text, this.center.x, this.center.y);
+          };
+
+          this.update = function() {
+            this.counter -= 1;
+            if (this.counter <= 0) {
+              document.location.reload(true);
+            }
+          };
+        };
+
+        this.c.entities.create(EndText, {
+          center: this.c.renderer.getViewCenter(),
+        });
+      }
+
       console.log("Destroying object", ent);
       this.c.entities.destroy(ent);
-      // TODO remove from game object map(s)
+      // TODO: remove from game object map(s)
     }
   }
 };
