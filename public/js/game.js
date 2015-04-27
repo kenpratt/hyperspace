@@ -144,7 +144,7 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
   var ents = this.c.entities.all();
   for (var i in ents) {
     var ent = ents[i];
-    if (ent && !(ent instanceof Star) && !ent.alive) {
+    if (ent && !(ent instanceof Star) && !(ent instanceof ShipIndicator) && !ent.alive) {
       if (ent instanceof Ship && ent.ownShip) {
         var EndText = function(game, settings) {
           this.alive = true;
@@ -184,6 +184,9 @@ Hyperspace.prototype.handleUpdate = function(updateData) {
 
       console.log("Destroying object", ent);
       this.c.entities.destroy(ent);
+      if (ent.indicator) {
+        this.c.entities.destroy(ent.indicator);
+      }
       // TODO: remove from game object map(s)
     }
   }
