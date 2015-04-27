@@ -125,7 +125,6 @@ func (g *Game) Run() {
 
 			if settings.debug {
 				log.Println(fmt.Sprintf("Ships: %d, Projectiles: %d, Asteroids: %d", len(state.Ships), len(state.Projectiles), len(state.Asteroids)))
-				log.Println(fmt.Sprintf("X: %v, %v Y: %v, %v, assCount: %v", minX, maxX, minY, maxY, assCount))
 			}
 		}
 	}
