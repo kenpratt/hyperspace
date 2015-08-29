@@ -41,4 +41,5 @@ hyperspace ALL=(ALL) NOPASSWD: /home/hyperspace/hyperspace/bin/restart
 
 ```sh
 go get github.com/gorilla/websocket
+go get github.com/lucasb-eyer/go-colorful
 ```
